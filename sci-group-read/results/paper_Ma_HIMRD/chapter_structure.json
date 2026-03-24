@@ -1,0 +1,35 @@
+{
+  "total_pages": 11,
+  "chapters": [
+    {
+      "name": "Abstract",
+      "start_page": 1,
+      "end_page": 1
+    },
+    {
+      "name": "Introduction",
+      "start_page": 1,
+      "end_page": 2
+    },
+    {
+      "name": "Methodology",
+      "start_page": 2,
+      "end_page": 5
+    },
+    {
+      "name": "Experiments",
+      "start_page": 5,
+      "end_page": 8
+    },
+    {
+      "name": "Related Work",
+      "start_page": 8,
+      "end_page": 9
+    },
+    {
+      "name": "Conclusion",
+      "start_page": 9,
+      "end_page": 9
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "title": "Attention Is All You Need",
+  "authors": [
+    "Ashish Vaswani",
+    "Noam Shazeer",
+    "Niki Parmar",
+    "Jakob Uszkoreit"
+  ],
+  "year": "2017",
+  "venue": "NeurIPS",
+  "abstract": "主流的序列转换模型基于复杂的循环或卷积神经网络...",
+  "conclusion": "在这项工作中，我们提出了Transformer，第一个完全基于注意力机制的序列转换模型...",
+  "metadata": {
+    "pages": 15,
+    "file_size": "2.1 MB",
+    "processed_date": "2024-03-15",
+    "extraction_method": "pdfplumber",
+    "confidence": 0.95
+  },
+  "key_contributions": [
+    "引入了Transformer架构",
+    "在序列建模中消除了循环",
+    "在翻译任务上达到了最先进的结果"
+  ]
+}

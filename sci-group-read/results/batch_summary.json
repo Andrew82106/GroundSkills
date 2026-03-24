@@ -1,0 +1,43 @@
+{
+  "total_files": 7,
+  "successful": 7,
+  "failed": 0,
+  "results": [
+    {
+      "file": "Hanif 等 - 2025 - TrojanWave Exploiting Prompt Learning for Stealthy Backdoor Attacks on Large Audio-Language Models.pdf",
+      "status": "success",
+      "output": "results/Hanif 等 - 2025 - TrojanWave Exploiting Prompt Learning for Stealthy Backdoor Attacks on Large Audio-Language Models_analysis.json"
+    },
+    {
+      "file": "Sima 等 - 2025 - VisCRA A Visual Chain Reasoning Attack for Jailbreaking Multimodal Large Language Models.pdf",
+      "status": "success",
+      "output": "results/Sima 等 - 2025 - VisCRA A Visual Chain Reasoning Attack for Jailbreaking Multimodal Large Language Models_analysis.json"
+    },
+    {
+      "file": "Ma 等 - Heuristic-Induced Multimodal Risk Distribution Jailbreak Attack for Multimodal Large Language Models.pdf",
+      "status": "success",
+      "output": "results/Ma 等 - Heuristic-Induced Multimodal Risk Distribution Jailbreak Attack for Multimodal Large Language Models_analysis.json"
+    },
+    {
+      "file": "Red-teaming the Multimodal Reasoning Jailbreaking Vision-Language Models via Cross-modal Entangleme.pdf",
+      "status": "success",
+      "output": "results/Red-teaming the Multimodal Reasoning Jailbreaking Vision-Language Models via Cross-modal Entangleme_analysis.json"
+    },
+    {
+      "file": "Gong 等 - 2025 - FigStep jailbreaking large vision-language models via typographic visual prompts.pdf",
+      "status": "success",
+      "output": "results/Gong 等 - 2025 - FigStep jailbreaking large vision-language models via typographic visual prompts_analysis.json"
+    },
+    {
+      "file": "Wang 等 - 2025 - Jailbreak Large Vision-Language Models Through Multi-Modal Linkage.pdf",
+      "status": "success",
+      "output": "results/Wang 等 - 2025 - Jailbreak Large Vision-Language Models Through Multi-Modal Linkage_analysis.json"
+    },
+    {
+      "file": "Ziqi 等 - 2025 - Visual Contextual Attack Jailbreaking MLLMs with Image-Driven Context Injection.pdf",
+      "status": "success",
+      "output": "results/Ziqi 等 - 2025 - Visual Contextual Attack Jailbreaking MLLMs with Image-Driven Context Injection_analysis.json"
+    }
+  ],
+  "processed_date": "2026-03-15T18:44:21.485432"
+}

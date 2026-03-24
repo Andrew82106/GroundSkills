@@ -1,0 +1,35 @@
+{
+  "total_pages": 17,
+  "chapters": [
+    {
+      "name": "Abstract",
+      "start_page": 1,
+      "end_page": 1
+    },
+    {
+      "name": "Introduction",
+      "start_page": 1,
+      "end_page": 2
+    },
+    {
+      "name": "Related Work",
+      "start_page": 2,
+      "end_page": 3
+    },
+    {
+      "name": "TrojanWave Framework",
+      "start_page": 3,
+      "end_page": 5
+    },
+    {
+      "name": "Experiments",
+      "start_page": 5,
+      "end_page": 11
+    },
+    {
+      "name": "Conclusion",
+      "start_page": 11,
+      "end_page": 11
+    }
+  ]
+}

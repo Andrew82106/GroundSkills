@@ -1,0 +1,40 @@
+{
+  "total_pages": 29,
+  "chapters": [
+    {
+      "name": "Abstract",
+      "start_page": 1,
+      "end_page": 1
+    },
+    {
+      "name": "Introduction",
+      "start_page": 1,
+      "end_page": 2
+    },
+    {
+      "name": "Related Work",
+      "start_page": 2,
+      "end_page": 3
+    },
+    {
+      "name": "Methodology",
+      "start_page": 3,
+      "end_page": 6
+    },
+    {
+      "name": "Experiments",
+      "start_page": 6,
+      "end_page": 12
+    },
+    {
+      "name": "Discussion",
+      "start_page": 12,
+      "end_page": 13
+    },
+    {
+      "name": "Conclusion",
+      "start_page": 13,
+      "end_page": 13
+    }
+  ]
+}
