@@ -1,0 +1,772 @@
+/* ========================================
+   HTML Presentation Themes
+   ======================================== */
+
+/* ========================================
+   1. 极简主义主题 (Minimalist)
+   ======================================== */
+.theme-minimalist {
+  /* 主色调 */
+  --primary-color: #1a1a1a;
+  --secondary-color: #4a4a4a;
+  --accent-color: #0066cc;
+
+  /* 背景色 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-slide: #ffffff;
+
+  /* 文字色 */
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+
+  /* 字体 */
+  --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', Consolas, monospace;
+
+  /* 间距 */
+  --slide-padding: 3rem;
+  --section-gap: 2rem;
+  --element-gap: 1.5rem;
+
+  /* 动画 */
+  --transition-speed: 0.4s;
+  --slide-animation: fade;
+
+  /* 边框 */
+  --border-color: #e5e5e5;
+  --border-radius: 4px;
+
+  /* 阴影 */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+
+  /* 强调色变体 */
+  --accent-light: #e6f0ff;
+  --accent-dark: #004c99;
+}
+
+.theme-minimalist .slide {
+  background: var(--bg-slide);
+  color: var(--text-primary);
+}
+
+.theme-minimalist h1,
+.theme-minimalist h2,
+.theme-minimalist h3 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* 章节页样式覆盖 */
+.theme-minimalist .slide-section h1,
+.theme-minimalist .slide-section h2,
+.theme-minimalist .slide-section h3,
+.theme-minimalist .slide-section p,
+.theme-minimalist .slide-section *,
+.theme-minimalist .slide-section code {
+  background: transparent !important;
+  -webkit-text-fill-color: white !important;
+  color: white !important;
+}
+
+.theme-minimalist h1 {
+  font-size: 3rem;
+  line-height: 1.1;
+}
+
+.theme-minimalist h2 {
+  font-size: 2.25rem;
+  line-height: 1.2;
+}
+
+.theme-minimalist h3 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+.theme-minimalist p {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.theme-minimalist a {
+  color: var(--accent-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.theme-minimalist a:hover {
+  border-bottom-color: var(--accent-color);
+}
+
+.theme-minimalist .highlight {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.theme-minimalist .slide-number {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* ========================================
+   2. 现代渐变主题 (Modern Gradient)
+   ======================================== */
+.theme-modern-gradient {
+  /* 主色调 */
+  --primary-color: #6366f1;
+  --secondary-color: #8b5cf6;
+  --accent-color: #ec4899;
+
+  /* 背景色 */
+  --bg-primary: #0f0f1a;
+  --bg-secondary: #1a1a2e;
+  --bg-slide: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+
+  /* 文字色 */
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-muted: #a0a0a0;
+
+  /* 字体 */
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Fira Code', 'SF Mono', Consolas, monospace;
+
+  /* 间距 */
+  --slide-padding: 3rem;
+  --section-gap: 2.5rem;
+  --element-gap: 1.5rem;
+
+  /* 动画 */
+  --transition-speed: 0.5s;
+  --slide-animation: slide;
+
+  /* 渐变 */
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  --gradient-secondary: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  --gradient-accent: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+
+  /* 边框 */
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-radius: 12px;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+
+  /* 强调色变体 */
+  --accent-light: rgba(236, 72, 153, 0.1);
+  --accent-dark: #be185d;
+}
+
+.theme-modern-gradient .slide {
+  background: var(--bg-slide);
+  color: var(--text-primary);
+}
+
+.theme-modern-gradient h1,
+.theme-modern-gradient h2,
+.theme-modern-gradient h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 章节页覆盖渐变文字样式 */
+.theme-modern-gradient .slide-section h1,
+.theme-modern-gradient .slide-section h2,
+.theme-modern-gradient .slide-section h3,
+.theme-modern-gradient .slide-section p,
+.theme-modern-gradient .slide-section *,
+.theme-modern-gradient .slide-section code {
+  background: transparent !important;
+  -webkit-text-fill-color: white !important;
+  color: white !important;
+}
+
+.theme-modern-gradient h1 {
+  font-size: 3.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.theme-modern-gradient h2 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+.theme-modern-gradient h3 {
+  font-size: 1.75rem;
+  line-height: 1.3;
+}
+
+.theme-modern-gradient p {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.theme-modern-gradient a {
+  color: var(--primary-color);
+  text-decoration: none;
+  position: relative;
+}
+
+.theme-modern-gradient a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--gradient-primary);
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+
+.theme-modern-gradient a:hover::after {
+  transform: scaleX(1);
+}
+
+.theme-modern-gradient .highlight {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
+
+.theme-modern-gradient .card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-modern-gradient .slide-number {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* ========================================
+   3. 学术专业主题 (Academic Professional)
+   ======================================== */
+.theme-academic {
+  /* 主色调 */
+  --primary-color: #1e3a5f;
+  --secondary-color: #2d5a87;
+  --accent-color: #b91c1c;
+
+  /* 背景色 */
+  --bg-primary: #fafafa;
+  --bg-secondary: #f0f0f0;
+  --bg-slide: #ffffff;
+
+  /* 文字色 */
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-muted: #888888;
+
+  /* 字体 */
+  --font-heading: 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Courier New', Consolas, monospace;
+
+  /* 间距 */
+  --slide-padding: 3rem;
+  --section-gap: 2rem;
+  --element-gap: 1.25rem;
+
+  /* 动画 */
+  --transition-speed: 0.35s;
+  --slide-animation: fade;
+
+  /* 边框 */
+  --border-color: #d0d0d0;
+  --border-radius: 2px;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* 强调色变体 */
+  --accent-light: #fef2f2;
+  --accent-dark: #991b1b;
+}
+
+.theme-academic .slide {
+  background: var(--bg-slide);
+  color: var(--text-primary);
+  border-top: 4px solid var(--primary-color);
+}
+
+.theme-academic h1,
+.theme-academic h2,
+.theme-academic h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.theme-academic h1 {
+  font-size: 2.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.theme-academic h2 {
+  font-size: 2rem;
+  line-height: 1.3;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.theme-academic h3 {
+  font-size: 1.5rem;
+  line-height: 1.4;
+}
+
+.theme-academic p {
+  font-size: 1.1rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  text-align: justify;
+}
+
+.theme-academic a {
+  color: var(--secondary-color);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.theme-academic a:hover {
+  color: var(--accent-color);
+}
+
+.theme-academic .highlight {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.theme-academic .slide-section {
+  background: linear-gradient(135deg, #0f2744 0%, #1a3a5c 100%) !important;
+}
+
+.theme-academic .slide-section h2 {
+  color: white !important;
+  border: none !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.theme-academic .slide-section p {
+  color: white !important;
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.theme-academic .slide-section *,
+.theme-academic .slide-section code {
+  color: white !important;
+}
+
+.theme-academic .slide-section code {
+  background: rgba(0,0,0,0.4) !important;
+  border: 1px solid rgba(255,255,255,0.5) !important;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.theme-academic .directory-structure {
+  background: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  padding: 1.5rem;
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  margin: 1rem 0;
+  overflow-x: auto;
+  white-space: pre;
+  color: #d4d4d4;
+}
+
+.theme-academic blockquote {
+  border-left: 4px solid var(--primary-color);
+  padding-left: 1.5rem;
+  margin-left: 0;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.theme-academic .slide-number {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* ========================================
+   4. 活泼创意主题 (Creative Playful)
+   ======================================== */
+.theme-creative {
+  /* 主色调 */
+  --primary-color: #ff6b6b;
+  --secondary-color: #4ecdc4;
+  --accent-color: #ffe66d;
+
+  /* 背景色 */
+  --bg-primary: #fffbf0;
+  --bg-secondary: #fff9e6;
+  --bg-slide: linear-gradient(135deg, #fffbf0 0%, #fff3cd 100%);
+
+  /* 文字色 */
+  --text-primary: #2d3436;
+  --text-secondary: #636e72;
+  --text-muted: #b2bec3;
+
+  /* 字体 */
+  --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Fira Code', 'SF Mono', Consolas, monospace;
+
+  /* 间距 */
+  --slide-padding: 3rem;
+  --section-gap: 2.5rem;
+  --element-gap: 1.5rem;
+
+  /* 动画 */
+  --transition-speed: 0.6s;
+  --slide-animation: zoom;
+
+  /* 渐变 */
+  --gradient-primary: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+  --gradient-secondary: linear-gradient(135deg, #4ecdc4 0%, #7ed6d1 100%);
+  --gradient-accent: linear-gradient(135deg, #ffe66d 0%, #fff59d 100%);
+
+  /* 边框 */
+  --border-color: rgba(45, 52, 54, 0.1);
+  --border-radius: 16px;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(255, 107, 107, 0.15);
+  --shadow-md: 0 8px 24px rgba(255, 107, 107, 0.2);
+  --shadow-lg: 0 16px 48px rgba(255, 107, 107, 0.25);
+
+  /* 强调色变体 */
+  --accent-light: rgba(255, 230, 109, 0.2);
+  --accent-dark: #f59e0b;
+}
+
+.theme-creative .slide {
+  background: var(--bg-slide);
+  color: var(--text-primary);
+}
+
+.theme-creative h1,
+.theme-creative h2,
+.theme-creative h3 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.theme-creative h1 {
+  font-size: 4rem;
+  line-height: 1;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.theme-creative h2 {
+  font-size: 2.75rem;
+  line-height: 1.2;
+  color: var(--secondary-color);
+}
+
+.theme-creative h3 {
+  font-size: 1.75rem;
+  line-height: 1.3;
+  color: var(--primary-color);
+}
+
+/* 章节页覆盖渐变文字样式 */
+.theme-creative .slide-section h1,
+.theme-creative .slide-section h2,
+.theme-creative .slide-section h3,
+.theme-creative .slide-section p,
+.theme-creative .slide-section *,
+.theme-creative .slide-section code {
+  background: transparent !important;
+  -webkit-text-fill-color: white !important;
+  color: white !important;
+}
+
+.theme-creative p {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.theme-creative a {
+  color: var(--primary-color);
+  text-decoration: none;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 107, 107, 0.1);
+  transition: all 0.2s;
+}
+
+.theme-creative a:hover {
+  background: rgba(255, 107, 107, 0.2);
+  transform: translateY(-1px);
+}
+
+.theme-creative .highlight {
+  background: var(--gradient-accent);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.theme-creative .emoji {
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+
+.theme-creative .slide-number {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* ========================================
+   通用样式类
+   ======================================== */
+
+/* 代码块 */
+.code-block {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+}
+
+/* 列表 */
+ul, ol {
+  padding-left: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+/* 引用 */
+blockquote {
+  border-left: 4px solid var(--accent-color);
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* 表格 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+th {
+  font-weight: 600;
+  background: var(--bg-secondary);
+}
+
+tr:hover {
+  background: var(--bg-secondary);
+}
+
+/* div 结构的表格（用于 markdown 转换） */
+.table-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-row:first-child {
+  font-weight: 600;
+  background: var(--bg-secondary);
+}
+
+.table-cell {
+  padding: 0.25rem 0.5rem;
+}
+
+/* 图片 */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--border-radius);
+}
+
+/* 卡片组件 */
+.card {
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 网格布局 */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--element-gap);
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--element-gap);
+}
+
+/* 柔性布局 */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--element-gap);
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--element-gap);
+}
+
+/* 按钮 */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 标签 */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.badge-primary {
+  background: var(--accent-light);
+  color: var(--accent-color);
+}
+
+/* 分割线 */
+hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 2rem 0;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  :root {
+    --slide-padding: 1.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .theme-academic .slide-section h2 {
+    font-size: 2rem !important;
+    color: white !important;
+  }
+
+  .theme-academic .slide-section p,
+  .theme-academic .slide-section *,
+  .theme-academic .slide-section code {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+  }
+
+  .theme-modern-gradient .slide-section h2,
+  .theme-creative .slide-section h2 {
+    font-size: 2rem !important;
+    color: white !important;
+  }
+
+  .theme-modern-gradient .slide-section p,
+  .theme-modern-gradient .slide-section *,
+  .theme-modern-gradient .slide-section code,
+  .theme-creative .slide-section p,
+  .theme-creative .slide-section *,
+  .theme-creative .slide-section code {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+  }
+
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}

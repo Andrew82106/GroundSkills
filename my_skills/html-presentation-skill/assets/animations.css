@@ -1,0 +1,561 @@
+/* ========================================
+   HTML Presentation Animations
+   ======================================== */
+
+/* ========================================
+   基础过渡设置
+   ======================================== */
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.slide.active {
+  visibility: visible;
+  z-index: 2;
+}
+
+.slide.inactive {
+  visibility: hidden;
+  z-index: 1;
+}
+
+/* ========================================
+   淡入淡出 (Fade)
+   ======================================== */
+
+.animation-fade .slide {
+  opacity: 0;
+  transition: opacity var(--transition-speed, 0.4s) ease-in-out;
+}
+
+.animation-fade .slide.active {
+  opacity: 1;
+}
+
+.animation-fade .slide.inactive {
+  opacity: 0;
+}
+
+/* 内容元素淡入 */
+.animation-fade .slide.active > * {
+  animation: fadeInSection 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.animation-fade .slide.active > *:nth-child(1) { animation-delay: 0.1s; }
+.animation-fade .slide.active > *:nth-child(2) { animation-delay: 0.2s; }
+.animation-fade .slide.active > *:nth-child(3) { animation-delay: 0.3s; }
+.animation-fade .slide.active > *:nth-child(4) { animation-delay: 0.4s; }
+.animation-fade .slide.active > *:nth-child(5) { animation-delay: 0.5s; }
+.animation-fade .slide.active > *:nth-child(6) { animation-delay: 0.6s; }
+.animation-fade .slide.active > *:nth-child(7) { animation-delay: 0.7s; }
+.animation-fade .slide.active > *:nth-child(8) { animation-delay: 0.8s; }
+
+@keyframes fadeInSection {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   滑动切换 (Slide)
+   ======================================== */
+
+.animation-slide .slide-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.animation-slide .slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform var(--transition-speed, 0.5s) ease-out;
+}
+
+/* 左右滑动 */
+.animation-slide.direction-horizontal .slide.prev {
+  transform: translateX(-100%);
+}
+
+.animation-slide.direction-horizontal .slide.active {
+  transform: translateX(0);
+}
+
+.animation-slide.direction-horizontal .slide.next {
+  transform: translateX(100%);
+}
+
+/* 上下滑动 */
+.animation-slide.direction-vertical .slide.prev {
+  transform: translateY(-100%);
+}
+
+.animation-slide.direction-vertical .slide.active {
+  transform: translateY(0);
+}
+
+.animation-slide.direction-vertical .slide.next {
+  transform: translateY(100%);
+}
+
+/* 内容元素滑入 */
+.animation-slide .slide.active > * {
+  animation: slideIn 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+.animation-slide .slide.active > *:nth-child(1) { animation-delay: 0.1s; }
+.animation-slide .slide.active > *:nth-child(2) { animation-delay: 0.15s; }
+.animation-slide .slide.active > *:nth-child(3) { animation-delay: 0.2s; }
+.animation-slide .slide.active > *:nth-child(4) { animation-delay: 0.25s; }
+.animation-slide .slide.active > *:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========================================
+   缩放过渡 (Zoom)
+   ======================================== */
+
+.animation-zoom .slide {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: all var(--transition-speed, 0.5s) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animation-zoom .slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.animation-zoom .slide.inactive {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+/* 内容元素缩放 */
+.animation-zoom .slide.active > * {
+  animation: zoomIn 0.4s ease-out forwards;
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.animation-zoom .slide.active > *:nth-child(1) { animation-delay: 0.1s; }
+.animation-zoom .slide.active > *:nth-child(2) { animation-delay: 0.15s; }
+.animation-zoom .slide.active > *:nth-child(3) { animation-delay: 0.2s; }
+.animation-zoom .slide.active > *:nth-child(4) { animation-delay: 0.25s; }
+.animation-zoom .slide.active > *:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+   3D 翻转 (Flip)
+   ======================================== */
+
+.animation-flip .slide-container {
+  perspective: 1000px;
+}
+
+.animation-flip .slide {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transition: all var(--transition-speed, 0.6s) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 水平翻转 */
+.animation-flip.direction-horizontal .slide.prev {
+  transform: rotateY(-90deg) translateX(-50%);
+  opacity: 0;
+}
+
+.animation-flip.direction-horizontal .slide.active {
+  transform: rotateY(0) translateX(0);
+  opacity: 1;
+}
+
+.animation-flip.direction-horizontal .slide.next {
+  transform: rotateY(90deg) translateX(50%);
+  opacity: 0;
+}
+
+/* 垂直翻转 */
+.animation-flip.direction-vertical .slide.prev {
+  transform: rotateX(-90deg) translateY(-50%);
+  opacity: 0;
+}
+
+.animation-flip.direction-vertical .slide.active {
+  transform: rotateX(0) translateY(0);
+  opacity: 1;
+}
+
+.animation-flip.direction-vertical .slide.next {
+  transform: rotateX(90deg) translateY(50%);
+  opacity: 0;
+}
+
+/* ========================================
+   立方体旋转 (Cube)
+   ======================================== */
+
+.animation-cube .slide-container {
+  perspective: 2000px;
+  transform-style: preserve-3d;
+}
+
+.animation-cube .slide {
+  position: absolute;
+  transform-style: preserve-3d;
+  transition: all var(--transition-speed, 0.6s) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animation-cube .slide.prev {
+  transform: rotateY(-90deg) translateZ(-50%);
+  opacity: 0;
+}
+
+.animation-cube .slide.active {
+  transform: rotateY(0) translateZ(0);
+  opacity: 1;
+}
+
+.animation-cube .slide.next {
+  transform: rotateY(90deg) translateZ(-50%);
+  opacity: 0;
+}
+
+/* ========================================
+   卡片覆盖 (Cover)
+   ======================================== */
+
+.animation-cover .slide {
+  transition: all var(--transition-speed, 0.5s) cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+}
+
+.animation-cover .slide.prev {
+  transform: translateX(-100%) scale(0.8);
+  opacity: 0;
+}
+
+.animation-cover .slide.active {
+  transform: translateX(0) scale(1);
+  opacity: 1;
+}
+
+.animation-cover .slide.next {
+  transform: translateX(100%) scale(1);
+  opacity: 1;
+}
+
+/* ========================================
+   展开收起 (Uncover)
+   ======================================== */
+
+.animation-uncover .slide {
+  transition: all var(--transition-speed, 0.5s) cubic-bezier(0.4, 0, 0.2, 1);
+  clip-path: inset(0 100% 0 0);
+}
+
+.animation-uncover .slide.prev {
+  clip-path: inset(0 0 0 0);
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.animation-uncover .slide.active {
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+  transform: scale(1);
+}
+
+.animation-uncover .slide.next {
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+}
+
+/* ========================================
+   弹性效果 (Bounce)
+   ======================================== */
+
+.animation-bounce .slide {
+  transition: all var(--transition-speed, 0.6s) cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animation-bounce .slide.prev {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.animation-bounce .slide.active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.animation-bounce .slide.next {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+/* ========================================
+   渐隐效果 (Dissolve)
+   ======================================== */
+
+.animation-dissolve .slide {
+  opacity: 0;
+  filter: blur(10px);
+  transition: all var(--transition-speed, 0.6s) ease;
+}
+
+.animation-dissolve .slide.active {
+  opacity: 1;
+  filter: blur(0);
+}
+
+.animation-dissolve .slide.inactive {
+  opacity: 0;
+  filter: blur(10px);
+}
+
+/* ========================================
+   元素入场动画
+   ======================================== */
+
+/* 从左侧飞入 */
+.animate-from-left {
+  animation: fromLeft 0.5s ease-out forwards;
+}
+
+@keyframes fromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 从右侧飞入 */
+.animate-from-right {
+  animation: fromRight 0.5s ease-out forwards;
+}
+
+@keyframes fromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 从下方飞入 */
+.animate-from-bottom {
+  animation: fromBottom 0.5s ease-out forwards;
+}
+
+@keyframes fromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 弹跳入场 */
+.animate-bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 旋转入场 */
+.animate-rotate-in {
+  animation: rotateIn 0.5s ease-out forwards;
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+
+/* 脉冲效果 */
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* 悬浮效果 */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ========================================
+   进度条动画
+   ======================================== */
+
+.progress-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--gradient-primary, var(--primary-color, #6366f1));
+  transition: width 0.3s ease-out;
+  z-index: 1000;
+}
+
+/* ========================================
+   指示器动画
+   ======================================== */
+
+.nav-indicator {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border-color, #e0e0e0);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.nav-dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background: var(--primary-color, #6366f1);
+}
+
+.nav-dot:hover {
+  background: var(--secondary-color, #8b5cf6);
+}
+
+/* ========================================
+   加载动画
+   ======================================== */
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border-color, #e0e0e0);
+  border-top-color: var(--primary-color, #6366f1);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   打印样式
+   ======================================== */
+
+@media print {
+  .slide {
+    position: relative;
+    opacity: 1 !important;
+    transform: none !important;
+    page-break-after: always;
+  }
+
+  .nav-indicator,
+  .progress-bar,
+  .controls {
+    display: none !important;
+  }
+}

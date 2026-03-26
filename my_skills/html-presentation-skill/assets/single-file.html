@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+
+  <!-- 配置信息 -->
+  <script id="presentation-config" type="application/json">
+  {
+    "theme": "{{THEME}}",
+    "animation": "{{ANIMATION}}",
+    "direction": "{{DIRECTION}}",
+    "showProgress": true,
+    "showIndicator": true,
+    "showSlideNumber": true,
+    "keyboardNavigation": true,
+    "touchNavigation": true,
+    "autoPlay": false,
+    "autoPlayInterval": 5000
+  }
+  </script>
+
+  <style>
+    /* ========================================
+       基础重置
+       ======================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+      background: var(--bg-primary, #f5f5f5);
+      color: var(--text-primary, #1a1a1a);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ========================================
+       演示文稿容器
+       ======================================== */
+    .presentation-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .slide-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ========================================
+       幻灯片基础样式
+       ======================================== */
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      padding: var(--slide-padding, 3rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .slide-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1 1 auto;
+    }
+
+    /* ========================================
+       幻灯片布局变体
+       ======================================== */
+    .slide.layout-center {
+      align-items: center;
+      text-align: center;
+    }
+
+    .slide.layout-left {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .slide.layout-right {
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .slide.layout-top {
+      justify-content: flex-start;
+      padding-top: 10vh;
+    }
+
+    .slide.layout-bottom {
+      justify-content: flex-end;
+      padding-bottom: 10vh;
+    }
+
+    .slide.slide-end {
+      justify-content: flex-start;
+      padding-top: 15vh;
+    }
+
+    /* ========================================
+       封面页样式
+       ======================================== */
+    .slide-cover {
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      padding-top: 15vh;
+    }
+
+    .slide-cover h1 {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .slide-cover .subtitle {
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .slide-cover .author {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+    }
+
+    /* ========================================
+       目录页样式
+       ======================================== */
+    .slide-toc ol {
+      list-style: none;
+      padding: 0;
+      counter-reset: toc-counter;
+    }
+
+    .slide-toc li {
+      counter-increment: toc-counter;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .slide-toc li::before {
+      content: counter(toc-counter) '.';
+      color: var(--accent-color);
+      font-weight: 600;
+      margin-right: 1rem;
+    }
+
+    .slide-toc li:hover {
+      padding-left: 1rem;
+      background: var(--bg-secondary);
+    }
+
+    /* ========================================
+       章节页样式
+       ======================================== */
+    .slide-section {
+      background: var(--gradient-primary, var(--primary-color));
+      color: white !important;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100%;
+    }
+
+    .slide-section,
+    .slide-section .slide-content,
+    .slide-section h1,
+    .slide-section h2,
+    .slide-section h3,
+    .slide-section h4,
+    .slide-section p,
+    .slide-section span,
+    .slide-section strong,
+    .slide-section b,
+    .slide-section i,
+    .slide-section em,
+    .slide-section a,
+    .slide-section li {
+      color: white !important;
+      -webkit-text-fill-color: white !important;
+      background: transparent !important;
+    }
+
+    .slide-section h2 {
+      font-size: 3rem;
+      border: none;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      font-weight: 700;
+    }
+
+    .slide-section p {
+      font-weight: 500;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .slide-section code {
+      background: rgba(0,0,0,0.4) !important;
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      font-family: 'Courier New', Consolas, monospace;
+      font-size: 1.1em;
+      color: white !important;
+      border: 1px solid rgba(255,255,255,0.5);
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      background-clip: padding-box;
+      -webkit-text-fill-color: white !important;
+    }
+
+    .slide-section .slide-content {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* ========================================
+       内容页样式
+       ======================================== */
+    .slide-content h2 {
+      margin-bottom: 1.5rem;
+    }
+
+    .slide-content p {
+      margin-bottom: 1rem;
+    }
+
+    .slide-content ul,
+    .slide-content ol {
+      margin-bottom: 1rem;
+    }
+
+    /* ========================================
+       进度条
+       ======================================== */
+    .progress-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: var(--gradient-primary, var(--primary-color, #6366f1));
+      transition: width 0.3s ease-out;
+      z-index: 1000;
+    }
+
+    /* ========================================
+       导航指示器
+       ======================================== */
+    .nav-indicator {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 1000;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .nav-dot.active {
+      width: 24px;
+      border-radius: 4px;
+      background: var(--primary-color, #6366f1);
+    }
+
+    .nav-dot:hover {
+      background: var(--secondary-color, #8b5cf6);
+    }
+
+    /* ========================================
+       幻灯片编号
+       ======================================== */
+    .slide-number {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      z-index: 1000;
+    }
+
+    /* ========================================
+       控制按钮
+       ======================================== */
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      right: 100px;
+      display: flex;
+      gap: 8px;
+      z-index: 1000;
+    }
+
+    .btn-control {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--bg-slide);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 1.25rem;
+    }
+
+    .btn-control:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* ========================================
+       代码块
+       ======================================== */
+    pre {
+      background: var(--bg-secondary);
+      border-radius: var(--border-radius, 8px);
+      padding: 1.5rem;
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      margin: 1rem 0;
+    }
+
+    code {
+      font-family: var(--font-mono, 'SF Mono', Consolas, monospace);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    :not(pre) > code {
+      background: var(--bg-secondary);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875em;
+    }
+
+    /* ========================================
+       表格
+       ======================================== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      font-weight: 600;
+      background: var(--bg-secondary);
+    }
+
+    tr:hover {
+      background: var(--bg-secondary);
+    }
+
+    /* ========================================
+       引用
+       ======================================== */
+    blockquote {
+      border-left: 4px solid var(--accent-color);
+      padding-left: 1.5rem;
+      margin: 1rem 0;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    /* ========================================
+       图片
+       ======================================== */
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--border-radius, 8px);
+      margin: 1rem 0;
+      cursor: zoom-in;
+      transition: transform 0.2s;
+    }
+
+    img:hover {
+      transform: scale(1.02);
+    }
+
+    /* 图片放大遮罩 */
+    .image-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      cursor: zoom-out;
+    }
+
+    .image-modal.active {
+      display: flex;
+    }
+
+    .image-modal img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      cursor: zoom-out;
+      transform: none;
+    }
+
+    .image-modal-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 3rem;
+      color: white;
+      cursor: pointer;
+      z-index: 10001;
+      line-height: 1;
+    }
+
+    .image-modal-close:hover {
+      color: #ccc;
+    }
+
+    /* ========================================
+       网格布局
+       ======================================== */
+    .grid {
+      display: grid;
+      gap: var(--element-gap, 1.5rem);
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* ========================================
+       柔性布局
+       ======================================== */
+    .flex {
+      display: flex;
+      gap: var(--element-gap, 1.5rem);
+    }
+
+    .flex-center {
+      justify-content: center;
+      align-items: center;
+    }
+
+    .flex-between {
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .flex-col {
+      flex-direction: column;
+    }
+
+    /* ========================================
+       卡片
+       ======================================== */
+    .card {
+      padding: 1.5rem;
+      border-radius: var(--border-radius, 8px);
+      background: var(--bg-secondary);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    /* ========================================
+       标签
+       ======================================== */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      background: var(--accent-light);
+      color: var(--accent-color);
+    }
+
+    /* ========================================
+       按钮
+       ======================================== */
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius, 8px);
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ========================================
+       高亮
+       ======================================== */
+    .highlight {
+      color: var(--accent-color);
+      font-weight: 500;
+    }
+
+    /* ========================================
+       分隔线
+       ======================================== */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border-color);
+      margin: 2rem 0;
+    }
+
+    /* ========================================
+       侧边导航栏
+       ======================================== */
+    .sidebar-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: var(--bg-sidebar, rgba(255, 255, 255, 0.95));
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--border-color);
+      z-index: 999;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-nav.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-header h3 {
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .sidebar-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 0;
+      line-height: 1;
+    }
+
+    .sidebar-close:hover {
+      color: var(--text-primary);
+    }
+
+    .slide-list {
+      list-style: none;
+      padding: 1rem;
+      flex: 1;
+    }
+
+    .slide-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .slide-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .slide-item.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .slide-number-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: var(--bg-secondary);
+      font-size: 0.75rem;
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .slide-item.active .slide-number-badge {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .slide-title-preview {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: var(--bg-sidebar, rgba(255, 255, 255, 0.95));
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      z-index: 998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* 内容区域偏移 */
+    .content-with-sidebar {
+      margin-left: 0;
+      transition: margin-left 0.3s ease;
+    }
+
+    .content-with-sidebar.sidebar-open {
+      margin-left: 280px;
+    }
+
+    /* ========================================
+       响应式
+       ======================================== */
+    @media (max-width: 768px) {
+      :root {
+        --slide-padding: 1.5rem;
+      }
+
+      .slide-cover h1 {
+        font-size: 2.5rem;
+      }
+
+      .slide-cover .subtitle {
+        font-size: 1.125rem;
+      }
+
+      .slide-section h2 {
+        font-size: 2rem !important;
+        color: white !important;
+      }
+
+      .slide-section p,
+      .slide-section * {
+        color: white !important;
+      }
+
+      .grid-2,
+      .grid-3,
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-indicator {
+        bottom: 60px;
+      }
+
+      .controls {
+        right: 20px;
+      }
+
+      .sidebar-nav {
+        width: 100%;
+        transform: translateY(-100%);
+      }
+
+      .sidebar-nav.open {
+        transform: translateY(0);
+      }
+
+      .sidebar-toggle {
+        top: auto;
+        bottom: 80px;
+        left: 20px;
+      }
+
+      .content-with-sidebar.sidebar-open {
+        margin-left: 0;
+      }
+    }
+
+    /* ========================================
+       打印样式
+       ======================================== */
+    @media print {
+      .progress-bar,
+      .nav-indicator,
+      .controls,
+      .slide-number {
+        display: none !important;
+      }
+
+      .slide {
+        position: relative;
+        page-break-after: always;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+
+  <!-- 主题样式 -->
+  {{THEME_CSS}}
+
+  <!-- 动画样式 -->
+  {{ANIMATION_CSS}}
+</head>
+<body>
+  <!-- 侧边导航切换按钮 -->
+  <button class="sidebar-toggle" id="sidebarToggle" title="目录">
+    ☰
+  </button>
+
+  <!-- 侧边导航栏 -->
+  <nav class="sidebar-nav" id="sidebarNav">
+    <div class="sidebar-header">
+      <h3>目录</h3>
+      <button class="sidebar-close" id="sidebarClose">✕</button>
+    </div>
+    <ul class="slide-list" id="slideList">
+      <!-- 幻灯片列表将通过 JS 生成 -->
+    </ul>
+  </nav>
+
+  <div class="presentation-container content-with-sidebar" id="contentArea">
+    <div class="slide-container">
+      <!-- 幻灯片内容将插入到这里 -->
+      {{SLIDES}}
+    </div>
+  </div>
+
+  <!-- 进度条 -->
+  <div class="progress-bar"></div>
+
+  <!-- 导航指示器 -->
+  <div class="nav-indicator"></div>
+
+  <!-- 幻灯片编号 -->
+  <div class="slide-number"></div>
+
+  <!-- 控制按钮 -->
+  <div class="controls">
+    <button class="btn-control btn-prev" title="上一页">←</button>
+    <button class="btn-control btn-next" title="下一页">→</button>
+  </div>
+
+  <!-- 核心脚本 -->
+  {{PRESENTATION_JS}}
+</body>
+</html>

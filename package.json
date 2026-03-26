@@ -1,0 +1,23 @@
+{
+  "name": "skills",
+  "version": "1.0.0",
+  "description": "我的个人技能库 (Ground Skills) - 用于汇总和组织可复用的 AI 技能模块。",
+  "main": "generate-paper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Andrew82106/GroundSkills.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Andrew82106/GroundSkills/issues"
+  },
+  "homepage": "https://github.com/Andrew82106/GroundSkills#readme",
+  "dependencies": {
+    "docx": "^9.6.1"
+  }
+}

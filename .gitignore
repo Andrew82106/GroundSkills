@@ -7,3 +7,5 @@ output/*/*.png
 node_modules/
 *.docx
 *.doc
+my_skills/side
+.claude
