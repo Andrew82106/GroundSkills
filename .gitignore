@@ -6,6 +6,7 @@ output/*_pages/*.png
 output/*/*.png
 node_modules/
 *.docx
+*.xlsx
 *.doc
 my_skills/side
 .claude
