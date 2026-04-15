@@ -14,6 +14,7 @@
 | **[my-paper-polish-skills](my_skills/my-paper-polish-skills/SKILL.md)** | 学术论文精修与 LaTeX 辅助。改善学术地道表达、消除冗词与优化结构，符合最佳排版标准。 | — |
 | **[scientific-visualization](my_skills/scientific-visualization/SKILL.md)** | 出版物级别的科学可视化生成。自动化绘制多子图、误差线及色盲友好的多维统计矢量图表。 | `matplotlib` `seaborn` `plotly` |
 | **[skill-creator](my_skills/skill-creator/SKILL.md)** | Agent Skill 辅助开发与闭环评测工具。用来创建 Skill，通过验证集评测和提示词跑分以优化效果。 | `Python 3` |
+| **[ultimate-scientific-research](my_skills/ultimate-scientific-research/SKILL.md)** | 全流程科研统帅引擎。覆盖 Idea 发掘（六顶帽辩论）→ 文献综述 → 实验设计 → 实验执行 → 论文撰写，含上下文熔断接力与动态 Skill 扫描。 | `Python 3` |
 
 ## 使用方式
 
@@ -31,7 +32,8 @@ SKILLS/
 │   ├── lightread-cli/              # LightRead 命令行集成
 │   ├── my-paper-polish-skills/     # 论文润色与 LaTeX 撰写
 │   ├── scientific-visualization/   # 出版级科学数据可视化
-│   └── skill-creator/              # Skill 开发与评测工具
+│   ├── skill-creator/              # Skill 开发与评测工具
+│   └── ultimate-scientific-research/ # 全流程科研统帅引擎
 ├── skills_documents/               # Skills 规范文档
 └── README.md
 ```
