@@ -216,6 +216,154 @@ editor.add_table(3, 4, data=[["姓名", "年龄"], ["张三", "25"]], style="Tab
 
 ---
 
+## 图片 API
+
+支持的 `width` / `height` 参数类型：
+- `float`：解释为**英寸**（如 `width=2` = 2 英寸）
+- python-docx `Length` 对象：`Inches(2)`、`Cm(5)`、`Pt(72)`、`Emu(...)`
+- `None`：使用图片原始尺寸；只指定一边时，另一边按比例自动缩放
+
+支持的 `alignment` 取值：`'left'` | `'center'` | `'right'` | `'justify'` | `'distribute'`。
+
+### `add_picture(image_path, width=None, height=None, alignment=None) -> dict`
+
+在文档末尾插入一张图片（生成新段落）。支持 PNG / JPG / GIF / BMP / TIFF。
+
+```python
+editor.add_picture("chart.png", width=4, alignment="center")
+```
+
+**返回:** `{"success": True, "para_idx": N, "image_path": "..."}`
+
+### `add_picture_to_paragraph(para_idx, image_path, width=None, height=None) -> dict`
+
+在已有段落末尾追加图片（作为新 Run），用于图文混排。
+
+```python
+from docx.shared import Cm
+editor.add_paragraph("评分：")
+editor.add_picture_to_paragraph(0, "star.png", width=Cm(0.5))
+```
+
+**返回:** `{"success": True, "para_idx": N, "run_idx": M, "image_path": "..."}`
+
+### `add_picture_to_table_cell(table_idx, row_idx, col_idx, image_path, width=None, height=None, alignment=None, clear_cell=False) -> dict`
+
+在表格单元格中插入图片。`clear_cell=True` 会先删除单元格内已有段落（包括文字）；`False` 则在原内容后追加。支持合并单元格（自动 XML 回退）。
+
+```python
+editor.add_picture_to_table_cell(0, 1, 1, "product.png",
+                                  width=1.5, alignment="center", clear_cell=True)
+```
+
+**返回:** `{"success": True, "table_idx": N, "row_idx": M, "col_idx": K, "image_path": "..."}`
+
+### `count_pictures() -> dict`
+
+统计文档中内联图片（inline shapes）的数量。
+
+**返回:** `{"count": N}`
+
+---
+
+## 公式 API（LaTeX → OMML）
+
+依赖：`pip install latex2mathml mathml2omml`。
+转换链路 LaTeX → MathML → OMML，最终生成 Word 原生公式 `<m:oMath>`，可在 Word 公式编辑器中继续编辑。
+
+**渲染失败行为**：方法**不抛异常**，会在公式位置写入文本 `[渲染失败] {原始 LaTeX}`，并在返回值中带上 `rendered=False` 与 `error` 字段。
+
+### `add_equation(latex, alignment=None) -> dict`
+
+在文档末尾插入公式（生成新段落）。
+
+```python
+editor.add_equation(r"x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}", alignment="center")
+```
+
+**返回（成功）：** `{"success": True, "para_idx": N, "rendered": True}`
+**返回（失败）：** `{"success": True, "para_idx": N, "rendered": False, "error": "..."}`
+
+### `add_equation_to_paragraph(para_idx, latex) -> dict`
+
+在已有段落末尾追加行内公式（与文字同段）。
+
+```python
+editor.add_paragraph("由 ")
+editor.add_equation_to_paragraph(0, r"F = ma")
+editor.add_run_to_paragraph(0, " 可知...")
+```
+
+**返回:** 同 `add_equation`，无 `alignment`。
+
+---
+
+## 分栏（Multi-column）API
+
+### `get_section_columns(section_idx: int = 0) -> dict`
+
+获取指定节的分栏设置。
+
+```python
+info = editor.get_section_columns(0)
+```
+
+**返回:**
+
+```python
+{
+    "num": 2,              # 栏数
+    "space": 1.27,         # 栏间距（厘米），仅 equal_width 时有效
+    "equal_width": True,   # 是否等宽分栏
+    "separator": False,    # 栏间是否有分隔线
+    "details": [           # 仅 equal_width=False 时有内容
+        {"width_cm": 7.5, "space_cm": 1.27},
+        {"width_cm": 7.5, "space_cm": 0},
+    ]
+}
+```
+
+### `set_section_columns(section_idx=0, num=2, space_cm=1.27, equal_width=True, separator=False, col_widths_cm=None) -> dict`
+
+设置指定节的分栏布局。
+
+- `section_idx`: 节索引（从 0 开始）
+- `num`: 栏数（1=单栏, 2=双栏, 3=三栏, ...）
+- `space_cm`: 栏间距（厘米），仅 `equal_width=True` 时生效
+- `equal_width`: 是否等宽分栏。设 `False` 时必须通过 `col_widths_cm` 指定每栏宽度
+- `separator`: 是否在栏间显示分隔线
+- `col_widths_cm`: 不等宽分栏时各栏宽度列表（厘米），长度必须 == `num`
+
+```python
+# 等宽双栏
+editor.set_section_columns(0, num=2, space_cm=1.27, separator=True)
+
+# 不等宽双栏
+editor.set_section_columns(0, num=2, equal_width=False,
+                           col_widths_cm=[10, 6], space_cm=1.0)
+
+# 改回单栏
+editor.set_section_columns(0, num=1)
+```
+
+**返回:** `{"success": True, "section_idx": 0, "num": 2}`
+
+### `add_column_break(para_idx: int = None) -> dict`
+
+插入分栏符（Column Break），强制后续内容转入下一栏。
+
+- `para_idx`: 在哪个段落**之前**插入分栏符。`None` = 在文档末尾追加一个含分栏符的新段落。
+
+```python
+editor.add_paragraph("左栏最后一段")
+editor.add_column_break()           # 后续内容从右栏开始
+editor.add_paragraph("右栏第一段")
+```
+
+**返回:** `{"success": True, "para_idx": N}`
+
+---
+
 ## 删除类 API
 
 ### `delete_paragraph(para_idx) -> dict`
@@ -241,6 +389,31 @@ editor.add_table(3, 4, data=[["姓名", "年龄"], ["张三", "25"]], style="Tab
 清空单元格文本（保留单元格结构和格式属性）。
 
 **返回:** `{"success": True, "cleared_text": "原内容", ...}`
+
+---
+
+## 三线表 API
+
+### `apply_three_line_style(table_idx, header_rows=1, top_border_pt=1.5, mid_border_pt=0.75, bottom_border_pt=1.5, color='000000') -> dict`
+
+将表格转换为三线表（booktabs）样式 —— 学术论文的标准表格格式。
+
+- `table_idx`: 表格索引
+- `header_rows`: 表头行数（默认1），栏目线在第 header_rows 行之后
+- `top_border_pt`: 顶线粗细（磅值），默认 1.5
+- `mid_border_pt`: 栏目线粗细（磅值），默认 0.75
+- `bottom_border_pt`: 底线粗细（磅值），默认 1.5
+- `color`: 线条颜色（hex），默认 `'000000'`
+
+```python
+# 单行表头
+editor.apply_three_line_style(0)
+
+# 双行表头
+editor.apply_three_line_style(1, header_rows=2)
+```
+
+**返回:** `{"success": True, "table_idx": N, "header_rows": M}`
 
 ---
 

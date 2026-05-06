@@ -17,8 +17,10 @@ from typing import Dict, Any, List, Optional, Union
 from docx import Document
 from docx.text.paragraph import Paragraph
 from docx.table import Table
-from docx.shared import Pt, Inches, RGBColor
+from docx.shared import Pt, Inches, Cm, Emu, RGBColor, Length
 from docx.oxml.ns import qn
+from docx.oxml.shared import OxmlElement
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from .traverser import DocumentTraverser, LocatedParagraph
 from .run_ops import replace_text_in_paragraph, apply_format_to_paragraph_text, _build_run_map, _is_text_run
@@ -146,12 +148,15 @@ class DocxEditor:
         for s_idx, section in enumerate(self._doc.sections):
             header = section.header
             footer = section.footer
+            # 读取分栏信息
+            col_info = self._read_cols_from_section(section)
             sections.append({
                 'index': s_idx,
                 'has_header': not header.is_linked_to_previous,
                 'has_footer': not footer.is_linked_to_previous,
                 'header_text': '\n'.join(p.text for p in header.paragraphs) if not header.is_linked_to_previous else '',
                 'footer_text': '\n'.join(p.text for p in footer.paragraphs) if not footer.is_linked_to_previous else '',
+                'columns': col_info,
             })
         result['sections'] = sections
 
@@ -459,6 +464,105 @@ class DocxEditor:
             'table_idx': table_idx, 'row_idx': row_idx, 'col_idx': col_idx,
         }
 
+    def apply_three_line_style(
+        self,
+        table_idx: int,
+        header_rows: int = 1,
+        top_border_pt: float = 1.5,
+        mid_border_pt: float = 0.75,
+        bottom_border_pt: float = 1.5,
+        color: str = '000000',
+    ) -> Dict[str, Any]:
+        """
+        将表格设置为三线表（booktabs）样式 —— 中文学术论文的标准表格格式。
+
+        三线表只保留三条横线：
+        - 顶线（top rule）：粗线，表格最上方
+        - 栏目线（mid rule）：细线，分隔表头与表体
+        - 底线（bottom rule）：粗线，表格最下方
+        - 所有竖线和其他横线均清除
+
+        Args:
+            table_idx: 表格索引
+            header_rows: 表头行数（默认1），栏目线在第 header_rows 行之后
+            top_border_pt: 顶线粗细（磅值），默认 1.5
+            mid_border_pt: 栏目线粗细（磅值），默认 0.75
+            bottom_border_pt: 底线粗细（磅值），默认 1.5
+            color: 线条颜色（hex），默认黑色
+
+        Returns:
+            {"success": True, "table_idx": N, "header_rows": M}
+        """
+        tables = self._doc.tables
+        if table_idx >= len(tables):
+            raise IndexError(f"表格索引 {table_idx} 超出范围，共 {len(tables)} 个表格")
+        table = tables[table_idx]
+
+        num_rows = len(table.rows)
+        if header_rows >= num_rows:
+            raise ValueError(f"header_rows ({header_rows}) 必须小于表格总行数 ({num_rows})")
+
+        # 尺寸转换: pt → 1/8 pt (Word 的 w:sz 单位)
+        top_sz = str(int(top_border_pt * 8))
+        mid_sz = str(int(mid_border_pt * 8))
+        bot_sz = str(int(bottom_border_pt * 8))
+
+        no_border = {'val': 'nil'}
+        top_rule = {'sz': top_sz, 'val': 'single', 'color': color, 'space': '0'}
+        mid_rule = {'sz': mid_sz, 'val': 'single', 'color': color, 'space': '0'}
+        bot_rule = {'sz': bot_sz, 'val': 'single', 'color': color, 'space': '0'}
+
+        # 第1步：清除表格级边框（tblBorders）并设置为无边框
+        tbl = table._tbl
+        tblPr = tbl.find(qn('w:tblPr'))
+        if tblPr is None:
+            tblPr = OxmlElement('w:tblPr')
+            tbl.insert(0, tblPr)
+
+        # 移除已有的 tblBorders
+        for old in tblPr.findall(qn('w:tblBorders')):
+            tblPr.remove(old)
+
+        tblBorders = OxmlElement('w:tblBorders')
+        for edge_name in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
+            el = OxmlElement(f'w:{edge_name}')
+            for k, v in no_border.items():
+                el.set(qn(f'w:{k}'), v)
+            tblBorders.append(el)
+        tblPr.append(tblBorders)
+
+        # 第2步：清除所有单元格级边框
+        for row in table.rows:
+            for cell in row.cells:
+                tc = cell._tc
+                tcPr = tc.find(qn('w:tcPr'))
+                if tcPr is not None:
+                    for old in tcPr.findall(qn('w:tcBorders')):
+                        tcPr.remove(old)
+
+        # 第3步：设置三线
+        # 为每一行累积需要设置的边框，最后一次性设置，避免 set_cell_border 的覆盖
+        # row_borders[row_idx] = dict of edge_name → rule
+        row_borders = {}
+
+        # 顶线：第一行的 top
+        row_borders.setdefault(0, {})['top'] = top_rule
+
+        # 栏目线：header 最后一行的 bottom
+        hr = header_rows - 1
+        row_borders.setdefault(hr, {})['bottom'] = mid_rule
+
+        # 底线：最后一行的 bottom
+        last = num_rows - 1
+        row_borders.setdefault(last, {})['bottom'] = bot_rule
+
+        for row_idx, edges in row_borders.items():
+            for cell in table.rows[row_idx].cells:
+                set_cell_border(cell, **edges)
+
+        return {'success': True, 'table_idx': table_idx, 'header_rows': header_rows}
+
+
     # ═══════════════════════════════════════════════
     #  保存
     # ═══════════════════════════════════════════════
@@ -588,6 +692,368 @@ class DocxEditor:
         return {'success': True, 'table_idx': idx}
 
     # ═══════════════════════════════════════════════
+    #  图片 API（插入 / 统计）
+    # ═══════════════════════════════════════════════
+
+    def add_picture(
+        self,
+        image_path: str,
+        width: Optional[Union[float, Length]] = None,
+        height: Optional[Union[float, Length]] = None,
+        alignment: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        在文档末尾插入一张图片（作为新段落）。
+
+        Args:
+            image_path: 图片文件路径（支持 PNG/JPG/GIF/BMP/TIFF 等）。
+            width:  图片宽度。float 视为英寸；可传 Inches(2)/Cm(5)/Emu(...) 等 Length 对象。
+                    width/height 都为 None 时使用图片原始尺寸；只指定一边则按比例缩放。
+            height: 图片高度，规则同 width。
+            alignment: 图片所在段落对齐方式 'left' | 'center' | 'right'，None = 默认（左）。
+
+        Returns:
+            {"success": True, "para_idx": N, "image_path": "..."}
+        """
+        para = self._doc.add_paragraph()
+        run = para.add_run()
+        run.add_picture(
+            image_path,
+            width=self._to_length(width),
+            height=self._to_length(height),
+        )
+        if alignment is not None:
+            para.alignment = self._alignment_enum(alignment)
+        idx = len(self._doc.paragraphs) - 1
+        return {'success': True, 'para_idx': idx, 'image_path': image_path}
+
+    def add_picture_to_paragraph(
+        self,
+        para_idx: int,
+        image_path: str,
+        width: Optional[Union[float, Length]] = None,
+        height: Optional[Union[float, Length]] = None,
+    ) -> Dict[str, Any]:
+        """
+        在正文中已存在的段落末尾追加一张图片（作为新的 Run）。
+        适用于"图文混排"场景，例如行内 emoji / 小图标 / 与文字同段的插图。
+
+        Args:
+            para_idx: 目标段落索引
+            image_path: 图片路径
+            width, height: 同 add_picture
+
+        Returns:
+            {"success": True, "para_idx": N, "run_idx": M, "image_path": "..."}
+        """
+        paras = self._doc.paragraphs
+        if para_idx >= len(paras):
+            raise IndexError(f"段落索引 {para_idx} 超出范围，正文共 {len(paras)} 段")
+        run = paras[para_idx].add_run()
+        run.add_picture(
+            image_path,
+            width=self._to_length(width),
+            height=self._to_length(height),
+        )
+        run_idx = len(paras[para_idx].runs) - 1
+        return {
+            'success': True,
+            'para_idx': para_idx,
+            'run_idx': run_idx,
+            'image_path': image_path,
+        }
+
+    def add_picture_to_table_cell(
+        self,
+        table_idx: int,
+        row_idx: int,
+        col_idx: int,
+        image_path: str,
+        width: Optional[Union[float, Length]] = None,
+        height: Optional[Union[float, Length]] = None,
+        alignment: Optional[str] = None,
+        clear_cell: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        在表格单元格中插入图片。
+
+        Args:
+            table_idx, row_idx, col_idx: 单元格坐标（支持合并单元格）
+            image_path: 图片路径
+            width, height: 同 add_picture
+            alignment: 图片所在段落的对齐 'left' | 'center' | 'right'
+            clear_cell: True = 先清空单元格已有文本/图片再插入；False = 在原内容后追加
+
+        Returns:
+            {"success": True, "table_idx": ..., "row_idx": ..., "col_idx": ..., "image_path": "..."}
+        """
+        cell = self._get_cell(table_idx, row_idx, col_idx)
+
+        if clear_cell:
+            for para in cell.paragraphs:
+                p_el = para._p
+                p_el.getparent().remove(p_el)
+            target_para = cell.add_paragraph()
+        else:
+            if cell.paragraphs and not cell.paragraphs[-1].runs and not cell.paragraphs[-1].text:
+                target_para = cell.paragraphs[-1]
+            else:
+                target_para = cell.add_paragraph()
+
+        run = target_para.add_run()
+        run.add_picture(
+            image_path,
+            width=self._to_length(width),
+            height=self._to_length(height),
+        )
+        if alignment is not None:
+            target_para.alignment = self._alignment_enum(alignment)
+
+        return {
+            'success': True,
+            'table_idx': table_idx,
+            'row_idx': row_idx,
+            'col_idx': col_idx,
+            'image_path': image_path,
+        }
+
+    # ═══════════════════════════════════════════════
+    #  公式 API（LaTeX → OMML）
+    # ═══════════════════════════════════════════════
+
+    def add_equation(
+        self,
+        latex: str,
+        alignment: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        在文档末尾插入 LaTeX 公式（生成新段落）。
+
+        转换链路：LaTeX → MathML（latex2mathml）→ OMML（mathml2omml）→ Word 段落。
+        生成的是 Word 原生公式（<m:oMath>），可在 Word 公式编辑器中继续编辑。
+
+        若任意一步转换失败，会在该位置写入文本 "[渲染失败] {原始 LaTeX}"，
+        以便人工排查；该方法本身不抛异常。
+
+        Args:
+            latex: LaTeX 源代码，例如 r"E = mc^2"、r"\\frac{a}{b}"
+            alignment: 段落对齐 'left' | 'center' | 'right'，None = 默认
+
+        Returns:
+            {"success": True, "para_idx": N, "rendered": True}
+            渲染失败时: {"success": True, "para_idx": N, "rendered": False, "error": "..."}
+        """
+        para = self._doc.add_paragraph()
+        result = self._insert_equation_into_paragraph(para, latex)
+        if alignment is not None:
+            para.alignment = self._alignment_enum(alignment)
+        idx = len(self._doc.paragraphs) - 1
+        return {'success': True, 'para_idx': idx, **result}
+
+    def add_equation_to_paragraph(
+        self,
+        para_idx: int,
+        latex: str,
+    ) -> Dict[str, Any]:
+        """
+        在正文中已存在段落的末尾追加公式（行内公式，与文字同段）。
+
+        Args:
+            para_idx: 目标段落索引
+            latex: LaTeX 源代码
+
+        Returns:
+            {"success": True, "para_idx": N, "rendered": True}
+            渲染失败时: {"success": True, "para_idx": N, "rendered": False, "error": "..."}
+        """
+        paras = self._doc.paragraphs
+        if para_idx >= len(paras):
+            raise IndexError(f"段落索引 {para_idx} 超出范围，正文共 {len(paras)} 段")
+        result = self._insert_equation_into_paragraph(paras[para_idx], latex)
+        return {'success': True, 'para_idx': para_idx, **result}
+
+    @staticmethod
+    def _preprocess_latex(latex: str) -> str:
+        """
+        修复 latex2mathml 已知的兼容性问题：
+        - \\bigl / \\bigr / \\big / \\Bigl / \\Bigr / \\Big / \\bigg / \\Bigg [lrm]?
+          这些大小修饰命令 latex2mathml 不识别，会把跟随的 \\{ \\} 留成字面量
+          导致 Word 里显示成 \\( \\}。直接剥掉前缀，保留后面的定界符。
+        - \\nicefrac{a}{b} → \\frac{a}{b}
+        """
+        import re as _re
+        latex = _re.sub(r'\\(?:big|Big|bigg|Bigg)[lrm]?(?=[\s\\({\[])', '', latex)
+        latex = _re.sub(r'\\nicefrac\b', r'\\frac', latex)
+        return latex
+
+    @staticmethod
+    def _insert_equation_into_paragraph(paragraph: Paragraph, latex: str) -> Dict[str, Any]:
+        """
+        把 LaTeX 转成 OMML 元素并追加到指定段落 <w:p> 末尾。
+        失败时退回写文本，并返回 {"rendered": False, "error": "..."}。
+        """
+        try:
+            import latex2mathml.converter as _l2m
+            import mathml2omml as _m2o
+            from docx.oxml import parse_xml
+            from docx.oxml.ns import nsmap as _nsmap
+
+            mathml = _l2m.convert(DocxEditor._preprocess_latex(latex))
+            omml_str = _m2o.convert(mathml)
+
+            # mathml2omml 输出的 <m:oMath> 没有 xmlns 声明，需要加上
+            ns_decl = (
+                ' xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"'
+                ' xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
+            )
+            if omml_str.startswith('<m:oMath>'):
+                omml_str = '<m:oMath' + ns_decl + '>' + omml_str[len('<m:oMath>'):]
+            elif omml_str.startswith('<m:oMath '):
+                # 已带属性，避免重复添加
+                pass
+            else:
+                # 不是预期格式
+                raise ValueError(f"mathml2omml 输出非 <m:oMath>: {omml_str[:80]}")
+
+            omath_el = parse_xml(omml_str)
+            paragraph._p.append(omath_el)
+            return {'rendered': True}
+        except Exception as e:
+            paragraph.add_run(f"[渲染失败] {latex}")
+            return {'rendered': False, 'error': f"{type(e).__name__}: {e}"}
+
+    def count_pictures(self) -> Dict[str, Any]:
+        """
+        统计文档中内联图片（inline shapes）的数量。
+
+        Returns:
+            {"count": N}
+        """
+        return {'count': len(self._doc.inline_shapes)}
+
+    # ═══════════════════════════════════════════════
+    #  分栏（Multi-column）API
+    # ═══════════════════════════════════════════════
+
+    def get_section_columns(self, section_idx: int = 0) -> Dict[str, Any]:
+        """
+        获取指定节的分栏设置。
+
+        Args:
+            section_idx: 节索引（从 0 开始）
+
+        Returns:
+            {
+                "num": 2,              # 栏数
+                "space": 1.27,         # 栏间距（厘米），仅 equal_width 时有效
+                "equal_width": True,   # 是否等宽分栏
+                "separator": False,    # 栏间是否有分隔线
+                "details": [           # 仅 equal_width=False 时有内容
+                    {"width_cm": 7.5, "space_cm": 1.27},
+                    {"width_cm": 7.5, "space_cm": 0},
+                ]
+            }
+        """
+        section = self._get_section(section_idx)
+        return self._read_cols_from_section(section)
+
+    def set_section_columns(
+        self,
+        section_idx: int = 0,
+        num: int = 2,
+        space_cm: float = 1.27,
+        equal_width: bool = True,
+        separator: bool = False,
+        col_widths_cm: Optional[List[float]] = None,
+    ) -> Dict[str, Any]:
+        """
+        设置指定节的分栏布局。
+
+        Args:
+            section_idx: 节索引
+            num: 栏数（1=单栏, 2=双栏, 3=三栏, ...）
+            space_cm: 栏间距（厘米），仅 equal_width=True 时生效
+            equal_width: 是否等宽分栏。设 False 时必须通过 col_widths_cm 指定每栏宽度
+            separator: 是否在栏间显示分隔线
+            col_widths_cm: 不等宽分栏时，各栏宽度列表（厘米），
+                           长度必须 == num。栏间距自动按 space_cm 填充。
+                           例如 [10, 6] 表示左栏 10cm、右栏 6cm。
+
+        Returns:
+            {"success": True, "section_idx": N, "num": 2}
+        """
+        section = self._get_section(section_idx)
+        sectPr = section._sectPr
+
+        # 移除已有的 <w:cols>
+        for old_cols in sectPr.findall(qn('w:cols')):
+            sectPr.remove(old_cols)
+
+        from lxml import etree
+        cols_el = etree.SubElement(sectPr, qn('w:cols'))
+        cols_el.set(qn('w:num'), str(num))
+
+        if separator:
+            cols_el.set(qn('w:sep'), '1')
+
+        if equal_width or col_widths_cm is None:
+            cols_el.set(qn('w:equalWidth'), '1')
+            # space 以 twips 为单位（1 cm = 567 twips）
+            space_twips = int(round(space_cm * 567))
+            cols_el.set(qn('w:space'), str(space_twips))
+        else:
+            if len(col_widths_cm) != num:
+                raise ValueError(
+                    f"col_widths_cm 长度 ({len(col_widths_cm)}) 必须等于栏数 ({num})"
+                )
+            cols_el.set(qn('w:equalWidth'), '0')
+            space_twips = int(round(space_cm * 567))
+            for i, w_cm in enumerate(col_widths_cm):
+                col_el = etree.SubElement(cols_el, qn('w:col'))
+                col_el.set(qn('w:w'), str(int(round(w_cm * 567))))
+                # 最后一栏不需要 space
+                if i < num - 1:
+                    col_el.set(qn('w:space'), str(space_twips))
+
+        return {'success': True, 'section_idx': section_idx, 'num': num}
+
+    def add_column_break(self, para_idx: Optional[int] = None) -> Dict[str, Any]:
+        """
+        插入分栏符（Column Break），强制后续内容转入下一栏。
+
+        在双栏/多栏布局中，用分栏符控制内容在哪一栏断开。
+        例如双栏模式下，在左栏末尾插入分栏符，后续内容会强制从右栏顶部开始。
+
+        Args:
+            para_idx: 在哪个段落**之前**插入分栏符。
+                      None = 在文档末尾追加一个含分栏符的新段落。
+                      指定索引时，会在该段落的第一个 Run 前插入 <w:br w:type="column"/>。
+
+        Returns:
+            {"success": True, "para_idx": N}
+        """
+        if para_idx is None:
+            # 在文档末尾追加一个新段落，包含分栏符
+            para = self._doc.add_paragraph()
+            run = para.add_run()
+            self._add_column_break_to_run(run)
+            idx = len(self._doc.paragraphs) - 1
+            return {'success': True, 'para_idx': idx}
+        else:
+            paras = self._doc.paragraphs
+            if para_idx >= len(paras):
+                raise IndexError(f"段落索引 {para_idx} 超出范围，正文共 {len(paras)} 段")
+            para = paras[para_idx]
+            # 在段落开头插入一个含分栏符的 Run
+            from lxml import etree
+            new_run = etree.SubElement(para._p, qn('w:r'))
+            br = etree.SubElement(new_run, qn('w:br'))
+            br.set(qn('w:type'), 'column')
+            # 将新 Run 移到段落最前面（在所有已有 Run 之前）
+            para._p.insert(0, new_run)
+            return {'success': True, 'para_idx': para_idx}
+
+    # ═══════════════════════════════════════════════
     #  删除类 API
     # ═══════════════════════════════════════════════
 
@@ -712,6 +1178,63 @@ class DocxEditor:
     #  内部辅助
     # ═══════════════════════════════════════════════
 
+    def _get_section(self, section_idx: int):
+        """获取指定节对象，含边界检查。"""
+        sections = self._doc.sections
+        if section_idx >= len(sections):
+            raise IndexError(
+                f"节索引 {section_idx} 超出范围，文档共 {len(sections)} 个节"
+            )
+        return sections[section_idx]
+
+    @staticmethod
+    def _read_cols_from_section(section) -> Dict[str, Any]:
+        """
+        从节的 sectPr 中读取 <w:cols> 分栏信息。
+        如果没有 <w:cols>，返回默认的单栏配置。
+        """
+        sectPr = section._sectPr
+        cols_el = sectPr.find(qn('w:cols'))
+
+        if cols_el is None:
+            return {
+                'num': 1,
+                'space': 0,
+                'equal_width': True,
+                'separator': False,
+                'details': [],
+            }
+
+        num = int(cols_el.get(qn('w:num'), '1'))
+        space_raw = cols_el.get(qn('w:space'), '0')
+        space_cm = round(int(space_raw) / 567, 2)
+        equal_width = cols_el.get(qn('w:equalWidth'), '1') != '0'
+        separator = cols_el.get(qn('w:sep'), '0') == '1'
+
+        details = []
+        for col_el in cols_el.findall(qn('w:col')):
+            w = col_el.get(qn('w:w'), '0')
+            s = col_el.get(qn('w:space'), '0')
+            details.append({
+                'width_cm': round(int(w) / 567, 2),
+                'space_cm': round(int(s) / 567, 2),
+            })
+
+        return {
+            'num': num,
+            'space': space_cm,
+            'equal_width': equal_width,
+            'separator': separator,
+            'details': details,
+        }
+
+    @staticmethod
+    def _add_column_break_to_run(run):
+        """在指定 Run 中插入 <w:br w:type="column"/>。"""
+        from lxml import etree
+        br = etree.SubElement(run._r, qn('w:br'))
+        br.set(qn('w:type'), 'column')
+
     def _get_cell(self, table_idx: int, row_idx: int, col_idx: int):
         """
         获取指定表格单元格，含边界检查。
@@ -768,3 +1291,36 @@ class DocxEditor:
             return None
         mapping = {0: 'left', 1: 'center', 2: 'right', 3: 'justify', 4: 'distribute'}
         return mapping.get(int(alignment), str(alignment))
+
+    @staticmethod
+    def _alignment_enum(name: str):
+        """将字符串对齐名转换为 WD_ALIGN_PARAGRAPH 枚举。"""
+        m = {
+            'left': WD_ALIGN_PARAGRAPH.LEFT,
+            'center': WD_ALIGN_PARAGRAPH.CENTER,
+            'right': WD_ALIGN_PARAGRAPH.RIGHT,
+            'justify': WD_ALIGN_PARAGRAPH.JUSTIFY,
+            'distribute': WD_ALIGN_PARAGRAPH.DISTRIBUTE,
+        }
+        if name not in m:
+            raise ValueError(f"未知对齐方式 '{name}'，支持: {list(m.keys())}")
+        return m[name]
+
+    @staticmethod
+    def _to_length(value):
+        """
+        将 width/height 参数标准化为 docx Length 对象。
+        - None         → None（使用图片原始尺寸）
+        - Length 对象  → 原样返回（Inches/Cm/Pt/Emu 等）
+        - int / float  → 视为英寸
+        """
+        if value is None:
+            return None
+        if isinstance(value, Length):
+            return value
+        if isinstance(value, (int, float)):
+            return Inches(value)
+        raise TypeError(
+            f"width/height 必须是 None、float（英寸）或 docx Length 对象，"
+            f"收到: {type(value).__name__}"
+        )
