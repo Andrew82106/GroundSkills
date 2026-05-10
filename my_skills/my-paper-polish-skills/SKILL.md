@@ -70,16 +70,16 @@ Convert to one of:
 
 **Acceptable exceptions:**
 
-- English abbreviation definitions: `残差认知贝叶斯网络（Residual Cognitive Bayesian Network, RC-BN）` — standard academic practice
+- English abbreviation definitions: `中文方法全称（English Method Name, EMN）` — standard academic practice
 - English term gloss after a Chinese term, only on first occurrence: `意图对齐（Intent Alignment）`
-- Numerical values or short labels in parentheses: `RC-BN的精确率（91.3\%）超过基线`
+- Numerical values or short labels in parentheses: `本文方法的精确率（91.3\%）超过基线`
 
 ### Subject Convention
 
 Every sentence describing what the paper or its authors did must have an explicit subject. The convention is:
 
 - **本文** — for actions performed by the paper or authors (proposing, designing, evaluating, computing, comparing, mapping, etc.)
-- **Method name** (MRC-BN, RC-BN) — for what the method itself does (introduces a connection, propagates a signal, outputs a posterior)
+- **Method name** — for what the method itself does (introduces a connection, propagates a signal, outputs a posterior)
 - **Named experiment or entity** (消融实验, 跨域迁移实验, AgentDoG, 表X) — for results, observations, or table contents
 
 Forbidden subjects:
@@ -122,6 +122,8 @@ Prefer moderate sentence length. If a sentence carries method, result, implicati
 ### One Paragraph, One Job
 
 Give each paragraph a clear function. Start with the main point, develop it with evidence or explanation, and remove sentences that repeat nearby material.
+
+When an explanatory analysis later supports causal interventions, ablations, or error analysis, give the explanatory analysis its own clear unit before the downstream result. State what phenomenon or dataset property it characterizes, then let the later experiment explicitly cross-check that characterization instead of repeating the same explanation in both places.
 
 ### Keep Claims Proportional
 
@@ -187,6 +189,10 @@ Wide tables are a common LaTeX problem. Before writing a table, estimate column 
 
 Also verify that `\begin{table*}` is closed with `\end{table*}` (not `\end{table}`), and vice versa. Mismatched environments cause silent LaTeX errors.
 
+### Strict Three-Line Tables
+
+Use booktabs-style three-line tables for manuscript tables. Avoid vertical rules in `tabular` column specs, avoid extra internal `\midrule` separators, and avoid standalone category rows such as `\multicolumn{...}{l}{...}` inside the table body. If categories are important, make them a formal column. If they are not essential, omit them and explain grouping in the prose.
+
 ### Caption Writing
 
 A caption is a title, not a description. It summarizes what the table or figure is in a short academic phrase. All supplementary information — metric definitions, abbreviation keys, reading instructions, analytical observations — belongs in the body text that references the table or figure.
@@ -207,7 +213,46 @@ Specific redundancy checks:
 
 If the table already conveys the information clearly, the figure is redundant and wastes space. When in doubt, omit the figure.
 
+For ablation studies, decide whether the reader needs raw scores or effects. If the analytical point is component contribution, a figure should show the change relative to the full model rather than a second copy of the absolute scores. Use diverging bars, slope charts, or another delta-focused encoding so losses and gains are visible at a glance.
+
+Keep generated figure typography consistent with the manuscript's existing visual language. When surrounding figures use a black sans-serif style, set the plotting script's font fallback explicitly instead of relying on Matplotlib defaults, and verify the embedded PDF visually after compilation.
+
+When a table reports a metric at one operating point such as `Metric@50%` while also showing multiple threshold or truncation columns, the prose must explain why that operating point was selected and why the other points are not repeated as separate metric columns. Also distinguish the point metric from adjacent aggregate metrics so readers do not mistake them for duplicate views of the same quantity.
+
+When introducing a baseline that is not self-evident from its name, briefly state its design principle and implementation. For LLM-based judge baselines, identify the input serialization, prompt objective, output format, whether training data is used, and any inference settings that materially affect reproducibility.
+
 ## Working Process
+
+### Repository-Aware Paper Editing
+
+When editing a LaTeX manuscript inside this repository, treat the paper as both prose and source code. Before making substantive changes, inspect the manuscript entry point, included chapter files, bibliography file, data files that feed tables, and current git status. Do not judge the paper only from the paragraph being edited if nearby files can contradict it.
+
+For this project, use `paper/final/main.tex` as the manuscript entry point unless the user points elsewhere. Check the chapter inputs, `paper/final/outline.md`, `paper/final/references.bib`, and `paper/final/data/*.csv` when the edit touches structure, claims, citations, or experimental numbers.
+
+After changes, compile from `paper/final` with:
+
+```bash
+latexmk -xelatex -interaction=nonstopmode -halt-on-error main.tex
+```
+
+Then inspect `main.log` and `main.blg` for missing citations, undefined references, missing graphics, fatal LaTeX errors, overfull boxes, and bibliography warnings. Remove transient untracked build artifacts such as `main.fls`, `main.fdb_latexmk`, and `main.xdv` unless the project explicitly tracks them.
+
+### Consistency Checks Learned From This Manuscript
+
+These checks are mandatory for the BN agent safety paper because they have already caused drift:
+
+- Keep the method name, acronym, title, abstract, conclusion, figure captions, table row labels, source data labels, generated-figure scripts, and PDF metadata synchronized. After a rename, search for legacy acronyms and keep them only when the manuscript explicitly defines them as distinct variants.
+- Keep experiment prose synchronized with actual tables and CSV files. If the text claims "20 baselines" or "all baselines", the table must either list all 20 baselines or clearly state that it reports a representative subset.
+- Keep category counts synchronized. If the prose says "three categories" but the table has closed-source, open-source, guard, and SOTA groups, revise the prose or table so the taxonomy matches.
+- Keep dataset scale statements precise. If related work and experiments report different counts, first identify whether the difference comes from benchmark version, record granularity, split protocol, or filtering, then state the corresponding data scope without inventing a cause.
+- Do not infer filtering merely because two dataset counts disagree. First trace the count through the local data files, loader, split function, and result JSON. Only call it a filtered subset if code or experiment logs show an explicit filtering rule.
+- Match attribution-analysis wording to the actual aggregation scope. If code aggregates all true unsafe test samples, call them unsafe test samples rather than successfully intercepted samples unless the records are explicitly filtered by predicted unsafe.
+- Surface outline and author placeholder issues when auditing, but do not edit `outline.md` or author metadata unless the user explicitly asks. In the current BN agent safety paper, the missing discussion chapter and placeholder author block are known non-blockers.
+- Treat user-scoped discussion items as read-only. If the user says dataset wording or method naming still needs discussion, do not edit those areas while making unrelated agreed changes.
+
+### Skill Update Loop
+
+When modifying this paper, update this skill in the same work session if the edit reveals a reusable problem, rule, or workflow improvement. Add only durable lessons that should affect future paper edits. Prefer revising an existing rule over appending near-duplicates. Keep additions concise and specific enough to guide a future agent without bloating the skill.
 
 ### Identifying Request Type
 

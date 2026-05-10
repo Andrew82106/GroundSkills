@@ -1,5 +1,5 @@
 {
-  "skill_name": "ieee-journal-writing",
+  "skill_name": "my-paper-polish-skills",
   "evals": [
     {
       "id": 1,
@@ -34,6 +34,19 @@
         "The rewrite maintains the procedural sequence of normalization, segmentation, encoding, attention, and classification.",
         "The rewrite removes vague phrasing such as 'simple and effective'.",
         "The rewrite retains methodological detail instead of collapsing the paragraph into a high-level summary."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Audit the current LaTeX paper state before polishing the experiments section. Identify what should be checked before editing and what must be synchronized afterward.",
+      "expected_output": "A repository-aware paper editing checklist that covers manuscript entry points, table data, terminology, citations, compilation, and skill updates.",
+      "files": [],
+      "expectations": [
+        "The response says to inspect the LaTeX entry point, included chapters, bibliography, data CSV files, and git status before editing.",
+        "The response flags terminology drift between legacy and current method acronyms as something to synchronize.",
+        "The response checks that experiment prose matches actual tables and source CSV files.",
+        "The response includes compiling with latexmk and checking log or bibliography warnings after edits.",
+        "The response mentions updating this skill when a reusable paper-polishing lesson is discovered."
       ]
     }
   ]
