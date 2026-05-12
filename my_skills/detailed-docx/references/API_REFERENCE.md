@@ -268,10 +268,17 @@ editor.add_picture_to_table_cell(0, 1, 1, "product.png",
 
 ## 公式 API（LaTeX → OMML）
 
-依赖：`pip install latex2mathml mathml2omml`。
-转换链路 LaTeX → MathML → OMML，最终生成 Word 原生公式 `<m:oMath>`，可在 Word 公式编辑器中继续编辑。
+依赖（按优先级）：
+- **首选** `pandoc`（命令行）：覆盖最全，对 `\rightarrow` / `\propto` / `\mathbf{}` / `\frac{}{}` 等所有常用 LaTeX 命令稳定可靠
+- **后备** `pip install latex2mathml mathml2omml`：无 pandoc 时自动启用，部分命令覆盖有限
 
-**渲染失败行为**：方法**不抛异常**，会在公式位置写入文本 `[渲染失败] {原始 LaTeX}`，并在返回值中带上 `rendered=False` 与 `error` 字段。
+转换链路 LaTeX → OMML，最终生成 Word 原生公式 `<m:oMath>`（行内）或 `<m:oMathPara>`（独立成段），可在 Word 公式编辑器中继续编辑。
+
+**返回值中的 `engine` 字段**指明实际使用的转换路径：`'pandoc'` / `'latex2mathml'`。
+
+**渲染失败行为**：方法**不抛异常**，会在公式位置写入文本 `[渲染失败] {原始 LaTeX}`（剥除控制字符），并在返回值中带上 `rendered=False` 与 `error` 字段。
+
+> ⚠️ **LaTeX 字符串请使用 raw string**：`r"\alpha"` 才能保留反斜杠；`"\alpha"` 在 Python 解析阶段就被破坏（`\a` 是响铃 0x07，`\r` 是回车）。
 
 ### `add_equation(latex, alignment=None) -> dict`
 
@@ -295,6 +302,37 @@ editor.add_run_to_paragraph(0, " 可知...")
 ```
 
 **返回:** 同 `add_equation`，无 `alignment`。
+
+### `add_equation_to_table_cell(table_idx, row_idx, col_idx, latex, clear_cell=True, alignment='center') -> dict`
+
+在已存在的表格单元格中插入公式（用于自定义复杂排版）。
+
+```python
+editor.add_equation_to_table_cell(0, 1, 2, r"\alpha_{ij} = 0.7",
+                                   clear_cell=True, alignment='center')
+```
+
+参数：
+- `clear_cell`：是否先清空目标单元格已有段落，默认 `True`
+- `alignment`：单元格内段落对齐，默认 `'center'`
+
+**返回:** `{"success": True, "table_idx": N, "row_idx": M, "col_idx": K, "rendered": bool}`
+
+### `add_equation_with_number(latex, number, eq_col_ratio=0.75, total_width_cm=6.95) -> dict`
+
+**论文级编号公式排版的一键 API**：底层创建无边框透明 1×2 表格，左格放公式（居中、垂直居中），右格放编号（右对齐、垂直居中、`<w:noWrap/>` 防换行）。
+
+```python
+editor.add_equation_with_number(r"P_{chain}(N_j) = P(N_i)\cdot \mathbf{M}_{ij}", "（5）")
+```
+
+参数：
+- `latex`：公式 LaTeX 源
+- `number`：编号文本，例如 `"(5)"` 或 `"（5）"`
+- `eq_col_ratio`：公式列宽占比（0~1），默认 0.75
+- `total_width_cm`：表格总宽（厘米）。**双栏论文每栏约 6.95cm（默认）**；单栏全宽通常 16cm 左右。**双栏论文中切勿用单栏全宽，否则公式被挤出可视区**。
+
+**返回:** `{"success": True, "table_idx": N, "rendered": bool}`
 
 ---
 

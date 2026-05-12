@@ -844,7 +844,7 @@ class DocxEditor:
             渲染失败时: {"success": True, "para_idx": N, "rendered": False, "error": "..."}
         """
         para = self._doc.add_paragraph()
-        result = self._insert_equation_into_paragraph(para, latex)
+        result = self._insert_equation_into_paragraph(para, latex, display=True)
         if alignment is not None:
             para.alignment = self._alignment_enum(alignment)
         idx = len(self._doc.paragraphs) - 1
@@ -869,8 +869,143 @@ class DocxEditor:
         paras = self._doc.paragraphs
         if para_idx >= len(paras):
             raise IndexError(f"段落索引 {para_idx} 超出范围，正文共 {len(paras)} 段")
-        result = self._insert_equation_into_paragraph(paras[para_idx], latex)
+        result = self._insert_equation_into_paragraph(paras[para_idx], latex, display=False)
         return {'success': True, 'para_idx': para_idx, **result}
+
+    def add_equation_to_table_cell(
+        self,
+        table_idx: int,
+        row_idx: int,
+        col_idx: int,
+        latex: str,
+        clear_cell: bool = True,
+        alignment: Optional[str] = 'center',
+    ) -> Dict[str, Any]:
+        """
+        在表格单元格中追加 LaTeX 公式（Word 原生 OMML）。
+
+        Args:
+            table_idx, row_idx, col_idx: 目标单元格定位
+            latex: LaTeX 源代码
+            clear_cell: 是否先清空单元格已有内容（默认 True）
+            alignment: 单元格内段落对齐，默认 'center'
+
+        Returns:
+            {"success": True, "table_idx": N, "row_idx": M, "col_idx": K, "rendered": bool}
+        """
+        cell = self._get_cell(table_idx, row_idx, col_idx)
+        if clear_cell:
+            # 删除原有段落（保留一个空 paragraph）
+            for p in list(cell.paragraphs):
+                p._p.getparent().remove(p._p)
+            para = cell.add_paragraph()
+        else:
+            para = cell.add_paragraph() if not cell.paragraphs else cell.paragraphs[-1]
+        if alignment is not None:
+            para.alignment = self._alignment_enum(alignment)
+        result = self._insert_equation_into_paragraph(para, latex, display=False)
+        return {
+            'success': True,
+            'table_idx': table_idx, 'row_idx': row_idx, 'col_idx': col_idx,
+            **result,
+        }
+
+    def add_equation_with_number(
+        self,
+        latex: str,
+        number: str,
+        eq_col_ratio: float = 0.75,
+        total_width_cm: float = 6.95,
+    ) -> Dict[str, Any]:
+        """
+        在文档末尾插入"公式 + 编号"行：用一个无边框透明 1×2 表格承载，
+        左列居中放公式，右列右对齐放编号。这是学术论文中编号公式的标准排版。
+
+        Args:
+            latex: 公式 LaTeX 源
+            number: 编号文本，例如 "(5)" 或 "（5）"
+            eq_col_ratio: 公式列宽占比（0~1），默认 0.82
+            total_width_cm: 表格总宽（厘米）。双栏论文每栏约 6.95cm（默认）；
+                            单栏全宽通常 16cm 左右
+
+        Returns:
+            {"success": True, "table_idx": N, "rendered": bool}
+        """
+        from docx.shared import Cm
+        # 创建 1×2 表格
+        table = self._doc.add_table(rows=1, cols=2)
+        table.autofit = False
+        try:
+            # 通过 tblW 强制固定总宽（避免被 Word 自动展开为整栏）
+            tblPr = table._tbl.find(qn('w:tblPr'))
+            if tblPr is None:
+                tblPr = OxmlElement('w:tblPr')
+                table._tbl.insert(0, tblPr)
+            for old in tblPr.findall(qn('w:tblW')):
+                tblPr.remove(old)
+            tblW = OxmlElement('w:tblW')
+            tblW.set(qn('w:w'), str(int(total_width_cm * 567)))  # cm → twips（1cm=567 twips）
+            tblW.set(qn('w:type'), 'dxa')
+            tblPr.append(tblW)
+
+            w_eq = Cm(total_width_cm * eq_col_ratio)
+            w_no = Cm(total_width_cm * (1 - eq_col_ratio))
+            table.columns[0].width = w_eq
+            table.columns[1].width = w_no
+            for row in table.rows:
+                row.cells[0].width = w_eq
+                row.cells[1].width = w_no
+        except Exception:
+            pass
+
+        table_idx = len(self._doc.tables) - 1
+
+        # 清掉所有边框，并设置两格垂直居中
+        no_border = {'val': 'nil'}
+        for c in range(2):
+            self.modify_table_cell_border(
+                table_idx, 0, c,
+                top=no_border, bottom=no_border, left=no_border, right=no_border,
+                insideH=no_border, insideV=no_border,
+            )
+            try:
+                cell = self._get_cell(table_idx, 0, c)
+                tcPr = cell._tc.get_or_add_tcPr()
+                for old in tcPr.findall(qn('w:vAlign')):
+                    tcPr.remove(old)
+                vAlign = OxmlElement('w:vAlign')
+                vAlign.set(qn('w:val'), 'center')
+                tcPr.append(vAlign)
+            except Exception:
+                pass
+
+        # 左列：公式（居中）
+        eq_result = self.add_equation_to_table_cell(
+            table_idx, 0, 0, latex, clear_cell=True, alignment='center'
+        )
+
+        # 右列：编号（右对齐，禁用换行）
+        cell = self._get_cell(table_idx, 0, 1)
+        for p in list(cell.paragraphs):
+            p._p.getparent().remove(p._p)
+        # 禁止单元格内文本自动换行
+        try:
+            tcPr = cell._tc.get_or_add_tcPr()
+            for old in tcPr.findall(qn('w:noWrap')):
+                tcPr.remove(old)
+            noWrap = OxmlElement('w:noWrap')
+            tcPr.append(noWrap)
+        except Exception:
+            pass
+        para = cell.add_paragraph()
+        para.alignment = self._alignment_enum('right')
+        run = para.add_run(number)
+
+        return {
+            'success': True,
+            'table_idx': table_idx,
+            'rendered': eq_result.get('rendered', False),
+        }
 
     @staticmethod
     def _preprocess_latex(latex: str) -> str:
@@ -887,40 +1022,111 @@ class DocxEditor:
         return latex
 
     @staticmethod
-    def _insert_equation_into_paragraph(paragraph: Paragraph, latex: str) -> Dict[str, Any]:
+    def _convert_latex_to_omml_via_pandoc(latex: str, display: bool = False) -> str:
+        """
+        用 pandoc 把 LaTeX 转成 <m:oMath>（行内）或 <m:oMathPara>（display）OMML 字符串。
+        要求系统已安装 pandoc。失败抛异常。
+        """
+        import subprocess, tempfile, os, re as _re
+
+        # 用 markdown + tex_math_dollars 扩展承载公式
+        delim = '$$' if display else '$'
+        md = f"{delim}{latex}{delim}\n"
+
+        with tempfile.TemporaryDirectory() as td:
+            md_path = os.path.join(td, 'eq.md')
+            dx_path = os.path.join(td, 'eq.docx')
+            with open(md_path, 'w', encoding='utf-8') as f:
+                f.write(md)
+            proc = subprocess.run(
+                ['pandoc', '-f', 'markdown+tex_math_dollars',
+                 '-t', 'docx', md_path, '-o', dx_path],
+                capture_output=True, timeout=15,
+            )
+            if proc.returncode != 0:
+                raise RuntimeError(f"pandoc failed: {proc.stderr.decode('utf-8', 'ignore')[:200]}")
+
+            import zipfile
+            with zipfile.ZipFile(dx_path) as zf:
+                with zf.open('word/document.xml') as f:
+                    doc_xml = f.read().decode('utf-8')
+
+        tag = 'm:oMathPara' if display else 'm:oMath'
+        m = _re.search(rf'<{tag}\b[^>]*>.*?</{tag}>', doc_xml, _re.DOTALL)
+        if not m:
+            # 退一步：display 情形 pandoc 可能输出 oMathPara 包裹的 oMath；
+            # inline 情形如果命中 oMathPara 也提取里面的 oMath
+            m2 = _re.search(r'<m:oMath\b[^>]*>.*?</m:oMath>', doc_xml, _re.DOTALL)
+            if not m2:
+                raise RuntimeError("no OMML element produced by pandoc")
+            return m2.group(0)
+        return m.group(0)
+
+    @staticmethod
+    def _insert_equation_into_paragraph(paragraph: Paragraph, latex: str,
+                                         display: bool = False) -> Dict[str, Any]:
         """
         把 LaTeX 转成 OMML 元素并追加到指定段落 <w:p> 末尾。
-        失败时退回写文本，并返回 {"rendered": False, "error": "..."}。
+        优先使用 pandoc（更稳健），失败则退回 latex2mathml + mathml2omml。
+        都失败时退回写文本。
+
+        Args:
+            paragraph: 目标段落
+            latex: 原始 LaTeX 源
+            display: True 表示独立成段的居中公式，False 表示行内公式
         """
+        from docx.oxml import parse_xml
+
+        ns_decl = (
+            ' xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"'
+            ' xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
+        )
+
+        # 路径 1：pandoc（首选）
+        last_err = None
+        try:
+            omml_str = DocxEditor._convert_latex_to_omml_via_pandoc(latex, display=display)
+            # 注入命名空间声明（pandoc 输出通常已在根 document 上声明，提取后需补上）
+            if omml_str.startswith('<m:oMath>'):
+                omml_str = '<m:oMath' + ns_decl + '>' + omml_str[len('<m:oMath>'):]
+            elif omml_str.startswith('<m:oMathPara>'):
+                omml_str = '<m:oMathPara' + ns_decl + '>' + omml_str[len('<m:oMathPara>'):]
+            elif omml_str.startswith('<m:oMath '):
+                # 已带属性
+                pass
+            elif omml_str.startswith('<m:oMathPara '):
+                pass
+            omath_el = parse_xml(omml_str)
+            paragraph._p.append(omath_el)
+            return {'rendered': True, 'engine': 'pandoc'}
+        except Exception as e:
+            last_err = e
+
+        # 路径 2：latex2mathml + mathml2omml（退回）
         try:
             import latex2mathml.converter as _l2m
             import mathml2omml as _m2o
-            from docx.oxml import parse_xml
-            from docx.oxml.ns import nsmap as _nsmap
 
             mathml = _l2m.convert(DocxEditor._preprocess_latex(latex))
             omml_str = _m2o.convert(mathml)
-
-            # mathml2omml 输出的 <m:oMath> 没有 xmlns 声明，需要加上
-            ns_decl = (
-                ' xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"'
-                ' xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
-            )
             if omml_str.startswith('<m:oMath>'):
                 omml_str = '<m:oMath' + ns_decl + '>' + omml_str[len('<m:oMath>'):]
             elif omml_str.startswith('<m:oMath '):
-                # 已带属性，避免重复添加
                 pass
             else:
-                # 不是预期格式
                 raise ValueError(f"mathml2omml 输出非 <m:oMath>: {omml_str[:80]}")
-
             omath_el = parse_xml(omml_str)
             paragraph._p.append(omath_el)
-            return {'rendered': True}
+            return {'rendered': True, 'engine': 'latex2mathml'}
         except Exception as e:
-            paragraph.add_run(f"[渲染失败] {latex}")
-            return {'rendered': False, 'error': f"{type(e).__name__}: {e}"}
+            last_err = e
+
+        # 路径 3：写入安全文本（剥离控制字符，避免 docx 写入二次失败）
+        import re as _re
+        safe_text = _re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', ' ', latex)
+        paragraph.add_run(f"[渲染失败] {safe_text}")
+        return {'rendered': False,
+                'error': f"{type(last_err).__name__}: {last_err}" if last_err else 'unknown'}
 
     def count_pictures(self) -> Dict[str, Any]:
         """

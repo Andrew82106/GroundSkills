@@ -31,9 +31,15 @@ metadata:
 
 ```bash
 pip install python-docx
-# 仅在使用公式 API 时需要：
+# 公式 API（推荐安装 pandoc，转换质量最稳定）：
+brew install pandoc          # macOS
+# 或 apt install pandoc / conda install -c conda-forge pandoc
+# 二选一的后备引擎：
 pip install latex2mathml mathml2omml
 ```
+
+公式 API 的引擎优先级：**pandoc → latex2mathml+mathml2omml → 写入"[渲染失败] {latex}" 文本**。
+pandoc 对 `\rightarrow`、`\propto`、`\mathbf{...}`、`\frac{}{}` 等命令的覆盖最完整。
 
 ## 导入方式
 
@@ -49,7 +55,7 @@ from my_docx import DocxEditor
 |:---|:---|:---|
 | **从零创建** | `create_new()`, `add_heading()`, `add_paragraph()`, `add_table()` | 创建空白文档并逐步添加内容 |
 | **插入图片** | `add_picture()`, `add_picture_to_paragraph()`, `add_picture_to_table_cell()`, `count_pictures()` | 在文档/段落/表格单元格中插入图片，保留原有图片 |
-| **插入公式** | `add_equation()`, `add_equation_to_paragraph()` | LaTeX → Word 原生公式（OMML），可在 Word 中继续编辑 |
+| **插入公式** | `add_equation()`, `add_equation_to_paragraph()`, `add_equation_to_table_cell()`, `add_equation_with_number()` | LaTeX → Word 原生公式（OMML），可在 Word 中继续编辑；含"公式 + 编号"一键排版 |
 | **结构化读取** | `get_structural_map()`, `get_table_data()`, `get_run_details()` | 将文档内容以 dict/list 形式输出 |
 | **安全文本替换** | `replace_text()`, `replace_in_table()`, `replace_in_paragraph()` | 跨 Run 替换，自动保留原格式 |
 | **增量格式修改** | `modify_format()`, `modify_paragraph_format()` | 仅叠加指定属性，不清除已有格式 |
@@ -142,7 +148,32 @@ editor.save("math.docx")
 生成的是 Word 原生公式 `<m:oMath>`，打开后可在 Word 公式编辑器里继续修改。
 
 **渲染失败时**：方法本身**不抛异常**，会在该位置写入文本 `[渲染失败] {原始 LaTeX}`，
-返回值 `{"rendered": False, "error": "..."}` 便于调用方判断和补救。
+返回值 `{"rendered": False, "error": "..."}` 便于调用方判断和补救。返回值还会带 `engine` 字段
+（`'pandoc'` / `'latex2mathml'`）标明实际使用了哪条转换路径。
+
+### 编号公式（公式 + 编号）
+
+中文学术论文里独立的编号公式通常需要**公式居中 + 右侧编号**的整齐排版。直接用 `add_equation()`
+再追加一个右对齐段落，会因为 Word 不知道两者在同一逻辑行而错位。本库提供一键 API：
+
+```python
+editor.add_equation_with_number(r"P(N_j) = P(N_i)\cdot \mathbf{M}_{ij}", "（5）")
+```
+
+底层实现是一个 **无边框透明 1×2 表格**，左格放公式（居中、垂直居中），右格放编号
+（右对齐、垂直居中、`<w:noWrap/>` 防换行）。可调参数：
+
+- `eq_col_ratio`：公式列宽占比（默认 0.75）
+- `total_width_cm`：表格总宽。**双栏论文每栏约 6.95cm（默认）**；单栏全宽通常 16cm 左右。
+  在双栏正文中如果误用单栏全宽，公式会被挤出可视区。
+
+### 在已有表格单元格中插入公式
+
+```python
+editor.add_equation_to_table_cell(table_idx=0, row_idx=1, col_idx=2,
+                                   latex=r"\alpha_{ij} = 0.7",
+                                   clear_cell=True, alignment='center')
+```
 
 ### 分栏布局（双栏 / 多栏）
 
@@ -252,6 +283,31 @@ editor.save("cleaned.docx")
 - **create_new() 必须指定保存路径**：`editor.save()` 会报错，必须 `editor.save("output.docx")`。
 - **分栏布局的本质限制**：Word 分栏是节级别的排版属性，内容在 XML 中仍是线性序列。`add_column_break()` 通过分栏符控制内容断开点，但无法精确保证某段内容一定出现在某一栏——最终由 Word 排版引擎决定。使用 `add_column_break()` 是最可靠的栏位控制手段。
 - **学术论文必须使用三线表**：当用户的文档是论文/学术稿件时，所有表格都应使用 `apply_three_line_style()` 转为三线表。这是中文学术论文的强制排版规范。
+
+### 模板装配陷阱（基于真实期刊投稿任务总结）
+
+- **`add_paragraph(fmt=...)` 只接受 Run 级格式**：`bold` / `italic` / `name` / `size` / `color` /
+  `superscript` 等会生效，而 **`alignment` / `space_before` / `space_after` / `line_spacing` /
+  `first_line_indent` 这些段落级 key 必须用 `modify_paragraph_format(idx, {...})` 单独设置**，
+  混在 `fmt` 里会被静默丢弃。建议在调用方包一层 helper 自动拆分两类 key。
+- **模板里的命名样式可能带多级列表编号**：直接套用 `Heading 1`、`作者`、`参考文献BT` 等样式时，
+  渲染出来可能看到 `1`、`1.1`、`1.1.1.2` 之类莫名其妙的前缀（来自多级列表 numbering 定义）。
+  解决：要么改用 `Normal` + 显式 `fmt` 指定字体字号，要么在用之前调用
+  `editor.modify_paragraph_format(idx, {'numbering': None})` 等手段清除编号——通常前者最稳妥。
+- **LaTeX 字符串必须用 raw string**：`'$\\alpha$'` 这种非 raw 字符串在 Python 解析后才到达
+  公式 API；`\r` 会被解析为回车，`\a` 会被解析为响铃（0x07），导致 docx 写入时
+  `ValueError: All strings must be XML compatible`。**正确写法是 `r'$\alpha$'`** 或 `'$\\\\alpha$'`。
+  本库内部对 raw string 友好，但 Python 解释层在你之前就介入了。
+- **双栏论文的页面有效宽**：A4 + 2 栏 + 1.27cm 间距下每栏约 **6.95cm**。任何 `add_table`
+  或 `add_picture` 默认按整页宽计算时都会溢出栏外被裁切，公式表更是如此（导致看不到编号）。
+  涉及双栏布局时，把图/表的 `width` 显式按栏宽（~2.7 英寸 / 6.95 cm）设置。
+- **公式被挤换行时编号会顶到上面**：单元格默认垂直对齐是 top。本库 `add_equation_with_number`
+  已自动把两格设为 `<w:vAlign w:val="center"/>`，但如果你手动构造类似表格，记得加这个属性。
+- **拓扑残差节符 = 在段落 `pPr` 上插 `<w:sectPr type="continuous" cols=N/>`**：要做"摘要单栏 →
+  正文双栏 → 图/表单栏 → 正文双栏"的频繁切换，标准做法是给"上一节最后一段"的 `pPr` 添加
+  连续节符。文档最末的 `<w:sectPr>` 决定**最末一节**的列数，常常会被遗漏，记得显式设置。
+- **PDF 图片不能直接 add_picture**：python-docx 只接受位图（PNG/JPG/GIF/BMP/TIFF）。论文里
+  常见的 `figures/*.pdf` 要先用 `PyMuPDF` (`fitz`) 转 PNG（`page.get_pixmap(dpi=220).save(...)`）。
 
 ## 详细 API 参考
 
