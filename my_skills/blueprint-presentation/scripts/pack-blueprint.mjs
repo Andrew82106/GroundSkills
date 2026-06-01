@@ -4,7 +4,7 @@ import { dirname, extname, join, resolve } from 'node:path';
 
 const projectDir = resolve(process.argv[2] || '.');
 const outputFlag = process.argv.indexOf('--output');
-const output = resolve(outputFlag > -1 ? process.argv[outputFlag + 1] : join(projectDir, 'dist', 'blueprint.html'));
+const output = resolve(outputFlag > -1 ? process.argv[outputFlag + 1] : join(projectDir, 'blueprint.html'));
 
 async function readOptional(filename, fallback) {
   try {
@@ -24,7 +24,7 @@ async function main() {
 
   let packed = index
     .replace('<link rel="stylesheet" href="./blueprint.css" data-blueprint-style>', `<style data-blueprint-style>\n${css}\n</style>`)
-    .replace('<script src="./blueprint.config.js" data-blueprint-config></script>', `<script data-blueprint-config>\n${config}\nwindow.BLUEPRINT_OVERRIDES = ${overrides};\n</script>`)
+    .replace('<script src="./blueprint.config.js" data-blueprint-config></script>', `<script data-blueprint-config>\n${config}\nwindow.BLUEPRINT_PACKED = true;\nwindow.BLUEPRINT_OVERRIDES = ${overrides};\n</script>`)
     .replace('<script src="./blueprint-runtime.js" data-blueprint-runtime></script>', `<script data-blueprint-runtime>\n${runtime}\n</script>`);
 
   const mimeByExtension = {

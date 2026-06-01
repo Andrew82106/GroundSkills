@@ -4,7 +4,8 @@ import { join, resolve } from 'node:path';
 import { loadBlueprintConfig } from './load-config.mjs';
 
 const projectDir = resolve(process.argv[2] || '.');
-const registeredTypes = new Set(['text', 'stats', 'table', 'diagram', 'quote', 'links', 'image']);
+const registeredTypes = new Set(['text', 'stats', 'table', 'diagram', 'structure', 'quote', 'links', 'image']);
+const registeredOverviewTypes = new Set(['mind-map', 'dag', 'list']);
 const errors = [];
 const warnings = [];
 
@@ -48,6 +49,36 @@ async function main() {
   }
 
   requireString(config.title, 'title');
+  if (config.overview !== undefined) {
+    if (!isObject(config.overview)) {
+      err('overview must be an object.');
+    } else {
+      if (config.overview.type !== undefined && !registeredOverviewTypes.has(config.overview.type)) {
+        err(`overview.type "${config.overview.type}" is not registered.`);
+      }
+      for (const key of ['width', 'height']) {
+        if (config.overview[key] !== undefined && (!Number.isFinite(config.overview[key]) || config.overview[key] <= 0)) {
+          err(`overview.${key} must be a positive number.`);
+        }
+      }
+    }
+  }
+  if (config.ui !== undefined) {
+    if (!isObject(config.ui)) {
+      err('ui must be an object.');
+    } else {
+      if (config.ui.defaultLanguage !== undefined) requireString(config.ui.defaultLanguage, 'ui.defaultLanguage');
+      if (config.ui.languages !== undefined && (!Array.isArray(config.ui.languages) || !config.ui.languages.length)) {
+        err('ui.languages must contain at least one language.');
+      }
+      if (Array.isArray(config.ui.languages)) {
+        for (const [index, language] of config.ui.languages.entries()) requireString(language, `ui.languages[${index}]`);
+        if (config.ui.defaultLanguage && !config.ui.languages.includes(config.ui.defaultLanguage)) {
+          err('ui.defaultLanguage must appear in ui.languages.');
+        }
+      }
+    }
+  }
   if (!Array.isArray(config.nodes) || !config.nodes.length) err('nodes must contain at least one overview node.');
   if (!Array.isArray(config.relations)) err('relations must be an array.');
   if (!Array.isArray(config.scenes)) err('scenes must be an array.');
@@ -72,6 +103,17 @@ async function main() {
     requireString(scene.title, `${path}.title`);
     if (sceneIds.has(scene.id)) err(`${path}.id duplicates scene "${scene.id}".`);
     sceneIds.add(scene.id);
+    if (scene.canvas !== undefined) {
+      if (!isObject(scene.canvas)) {
+        err(`${path}.canvas must be an object.`);
+      } else {
+        for (const key of ['width', 'height']) {
+          if (scene.canvas[key] !== undefined && (!Number.isFinite(scene.canvas[key]) || scene.canvas[key] <= 0)) {
+            err(`${path}.canvas.${key} must be a positive number.`);
+          }
+        }
+      }
+    }
     if (!Array.isArray(scene.components)) {
       err(`${path}.components must be an array.`);
       continue;
@@ -100,6 +142,30 @@ async function main() {
       if (component.type === 'links' && !Array.isArray(component.items)) err(`${componentPath}.items must be an array.`);
       if (component.type === 'table' && (!Array.isArray(component.columns) || !Array.isArray(component.rows))) {
         err(`${componentPath} must define columns and rows arrays.`);
+      }
+      if (component.type === 'structure') {
+        if (component.structureType !== undefined && !registeredOverviewTypes.has(component.structureType)) {
+          err(`${componentPath}.structureType "${component.structureType}" is not registered.`);
+        }
+        if (!Array.isArray(component.nodes) || !component.nodes.length) {
+          err(`${componentPath}.nodes must contain at least one structure node.`);
+        }
+        if (!Array.isArray(component.relations)) err(`${componentPath}.relations must be an array.`);
+        const structureNodeIds = new Set();
+        for (const [nodeIndex, node] of (component.nodes || []).entries()) {
+          const nodePath = `${componentPath}.nodes[${nodeIndex}]`;
+          requireString(node.id, `${nodePath}.id`);
+          requireString(node.title, `${nodePath}.title`);
+          if (structureNodeIds.has(node.id)) err(`${nodePath}.id duplicates structure node "${node.id}".`);
+          structureNodeIds.add(node.id);
+          if (!Number.isFinite(node.x) || node.x < 4 || node.x > 96) err(`${nodePath}.x must be between 4 and 96.`);
+          if (!Number.isFinite(node.y) || node.y < 8 || node.y > 92) err(`${nodePath}.y must be between 8 and 92.`);
+        }
+        for (const [relationIndex, relation] of (component.relations || []).entries()) {
+          const relationPath = `${componentPath}.relations[${relationIndex}]`;
+          if (!structureNodeIds.has(relation.from)) err(`${relationPath}.from references missing structure node "${relation.from}".`);
+          if (!structureNodeIds.has(relation.to)) err(`${relationPath}.to references missing structure node "${relation.to}".`);
+        }
       }
     }
 
@@ -130,6 +196,17 @@ async function main() {
       for (const [itemIndex, item] of (component.items || []).entries()) {
         if (item.scene && !sceneIds.has(item.scene)) {
           err(`scenes[${sceneIndex}].components[${componentIndex}].items[${itemIndex}].scene references missing scene "${item.scene}".`);
+        }
+      }
+    }
+  }
+
+  for (const [sceneIndex, scene] of (config.scenes || []).entries()) {
+    for (const [componentIndex, component] of (scene.components || []).entries()) {
+      if (component.type !== 'structure') continue;
+      for (const [nodeIndex, node] of (component.nodes || []).entries()) {
+        if (node.scene && !sceneIds.has(node.scene)) {
+          err(`scenes[${sceneIndex}].components[${componentIndex}].nodes[${nodeIndex}].scene references missing scene "${node.scene}".`);
         }
       }
     }

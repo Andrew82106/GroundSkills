@@ -1,5 +1,45 @@
 # Blueprint Component Contracts
 
+## Blueprint Options
+
+Choose the global structure form and canvas size according to the content:
+
+```js
+overview: {
+  type: "dag",
+  width: 1440,
+  height: 900
+}
+```
+
+Supported overview types: `mind-map`, `dag`, and `list`. All three use the same movable canvas. Node placement remains explicit, so the author controls the composition.
+
+Declare the interface language during generation:
+
+```js
+ui: {
+  defaultLanguage: "zh-CN",
+  languages: ["zh-CN", "en"],
+  languageLabels: { "zh-CN": "中文", en: "EN" }
+}
+```
+
+The built-in interface dictionary covers `zh-CN` and `en`. Add `ui.labels[language]` only when overriding built-in labels or introducing another interface language. Presentation content remains authored text; the runtime does not translate it.
+
+## Scene Canvases
+
+Every scene is a pannable and zoomable local canvas, not a fixed slide. Override the default `1600 × 1000` canvas only when the content needs a different working area:
+
+```js
+{
+  id: "analysis-scene",
+  canvas: { width: 1800, height: 1200 },
+  components: []
+}
+```
+
+The runtime fits the full canvas on entry. Viewers can zoom and pan in presentation mode. Rehearsal mode additionally allows component layout changes.
+
 ## Shared Fields
 
 Every scene component uses:
@@ -77,6 +117,25 @@ Editable during rehearsal: headings and cells. Keep tables compact.
 
 Use for a small local relationship. Keep labels in HTML. Use SVG only for geometry.
 
+### `structure`
+
+```js
+{
+  type: "structure",
+  title: "Local reasoning map",
+  structureType: "dag",
+  nodes: [
+    { id: "question", title: "Question", summary: "What needs explanation?", x: 14, y: 50 },
+    { id: "evidence", title: "Evidence", summary: "Inspect the supporting material.", scene: "evidence-scene", x: 52, y: 50 }
+  ],
+  relations: [
+    { from: "question", to: "evidence", label: "inspect" }
+  ]
+}
+```
+
+Use when a scene contains a mind-map, DAG, or list that participates in navigation. Supported `structureType` values: `mind-map`, `dag`, and `list`. Clicking a node opens its preview; entering its scene adds another level to the navigation path.
+
 ### `quote`
 
 ```js
@@ -97,6 +156,7 @@ Editable during rehearsal: quote and citation.
   title: "Continue exploring",
   items: [
     { label: "Open solution scene", scene: "solution-scene" },
+    { label: "Return one level", action: "back" },
     { label: "Return to overview", action: "overview" },
     { label: "External reference", href: "https://example.com" }
   ]
@@ -147,3 +207,7 @@ Use `cover` for photographs and `contain` for screenshots or dense diagrams. Edi
 ```
 
 Relations must point to registered overview nodes. Keep labels short.
+
+## Navigation
+
+Entering a scene records the current level. A `links` item or `structure` node may enter another scene, creating a deeper path. Use `{ action: "back" }` to return one level and `{ action: "overview" }` only for an explicit jump to the root structure.

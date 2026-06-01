@@ -2,6 +2,16 @@ window.BLUEPRINT_CONFIG = {
   title: '蓝图 Blueprint',
   subtitle: '基于自由组件的结构化大屏展示方案',
   meta: 'STRUCTURED PRESENTATION / DEMO',
+  overview: {
+    type: 'mind-map',
+    width: 1440,
+    height: 900
+  },
+  ui: {
+    defaultLanguage: 'zh-CN',
+    languages: ['zh-CN', 'en'],
+    languageLabels: { 'zh-CN': '中文', en: 'EN' }
+  },
   nodes: [
     {
       id: 'opening',
@@ -57,6 +67,7 @@ window.BLUEPRINT_CONFIG = {
     {
       id: 'structure-scene',
       node: 'structure',
+      canvas: { width: 1600, height: 1000 },
       eyebrow: 'SCENE 01 / STRUCTURE',
       title: '结构本身就是导航。',
       summary: '观众先理解全局链条，再决定进入哪一个局部。',
@@ -72,16 +83,21 @@ window.BLUEPRINT_CONFIG = {
         },
         {
           id: 'structure-diagram',
-          type: 'diagram',
+          type: 'structure',
           eyebrow: 'LOCAL MODEL',
           title: '结构 → 节点 → 场景 → 组件',
+          structureType: 'dag',
           nodes: [
-            { id: 'graph', label: '全局蓝图' },
-            { id: 'node', label: '节点概览' },
-            { id: 'scene', label: '局部场景' },
-            { id: 'block', label: '证据组件' }
+            { id: 'graph', title: '全局蓝图', summary: '先看完整结构。', x: 12, y: 50 },
+            { id: 'node', title: '节点概览', summary: '点击后展开摘要。', x: 38, y: 50 },
+            { id: 'scene', title: '局部场景', summary: '场景也是可平移画布。', x: 64, y: 50 },
+            { id: 'block', title: '证据组件', summary: '进入组件场景。', scene: 'components-scene', x: 90, y: 50 }
           ],
-          edges: [['graph', 'node'], ['node', 'scene'], ['scene', 'block']],
+          relations: [
+            { from: 'graph', to: 'node' },
+            { from: 'node', to: 'scene' },
+            { from: 'scene', to: 'block' }
+          ],
           slot: { x: 9, y: 1, w: 8, h: 6 }
         },
         {
@@ -108,7 +124,7 @@ window.BLUEPRINT_CONFIG = {
           items: [
             { value: '16', unit: '列', label: '场景网格' },
             { value: '12', unit: '行', label: '垂直坐标' },
-            { value: '07', unit: '类', label: '首批组件' }
+            { value: '08', unit: '类', label: '首批组件' }
           ],
           slot: { x: 1, y: 1, w: 8, h: 5 }
         },

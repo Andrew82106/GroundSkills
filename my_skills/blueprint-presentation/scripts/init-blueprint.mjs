@@ -23,7 +23,9 @@ async function main() {
   console.log('Next:');
   console.log(`  1. Edit ${join(target, 'blueprint.config.js')}`);
   console.log(`  2. Validate with: node ${join(skillRoot, 'scripts', 'validate-blueprint.mjs')} ${target}`);
-  console.log(`  3. Preview with: cd ${target} && python3 -m http.server 4173`);
+  console.log(`  3. Optionally preview source edits with: cd ${target} && python3 -m http.server 4173`);
+  console.log(`  4. Pack with: node ${join(skillRoot, 'scripts', 'pack-blueprint.mjs')} ${target}`);
+  console.log(`  5. Deliver ${join(target, 'blueprint.html')}; viewers open it directly.`);
 }
 
 main().catch((error) => {

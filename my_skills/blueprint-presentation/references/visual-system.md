@@ -40,10 +40,10 @@ Use heavier weight as text gets smaller. Do not use light-weight small text.
 
 Use two coordinate systems:
 
-- Overview canvas: percent-based node positions and SVG relations.
-- Scene canvas: a strict 16-column by 12-row grid.
+- Overview canvas: a fixed-size, pannable canvas with percent-based node positions and optional SVG relations.
+- Scene canvas: a fixed-size, pannable canvas containing a strict 16-column by 12-row grid.
 
-The overview should show the global chain without interaction. Use node clicks to disclose summaries and scene-entry links, not to reveal basic structure.
+The initial overview should fit the complete structure without interaction. After zooming, allow viewers to pan the canvas instead of compressing nodes back into the viewport. Use node clicks to disclose summaries and scene-entry links, not to reveal basic structure.
 
 Each scene should include:
 
@@ -51,6 +51,8 @@ Each scene should include:
 - A scene heading on the top-left axis.
 - A quiet miniature structure map or context path.
 - A component grid with deliberate whitespace.
+
+A scene may contain a `structure` component and continue into deeper scenes. Do not treat a scene as a terminal slide.
 
 ## Motion
 

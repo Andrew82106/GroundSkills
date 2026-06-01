@@ -1,3 +1,1412 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#002fa7">
+  <title>Blueprint Skill Manual · 自说明 Demo</title>
+  <style data-blueprint-style>
+/*
+ * Blueprint Presentation - AGPL-3.0
+ * Adapts Swiss visual-system ideas from https://github.com/op7418/guizang-ppt-skill
+ */
+:root {
+  --paper: #fafaf8;
+  --paper-rgb: 250, 250, 248;
+  --ink: #0a0a0a;
+  --ink-rgb: 10, 10, 10;
+  --grey-1: #f0f0ee;
+  --grey-2: #d4d4d2;
+  --grey-3: #737373;
+  --accent: #002fa7;
+  --accent-rgb: 0, 47, 167;
+  --accent-on: #ffffff;
+  --border: rgba(10, 10, 10, .16);
+  --sans: "Helvetica Neue", "Arial Narrow", "PingFang SC", "Noto Sans SC", sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", "Cascadia Code", "Consolas", monospace;
+  --ease: cubic-bezier(.2, 0, .38, .9);
+  --grid-line: rgba(0, 47, 167, .095);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+body {
+  overflow: hidden;
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible, [contenteditable="true"]:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.app-shell {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(var(--paper-rgb), .92), rgba(var(--paper-rgb), .92)),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(10, 10, 10, .035) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, rgba(10, 10, 10, .035) 31px 32px);
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 54px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(var(--paper-rgb), .95);
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  min-width: 235px;
+  gap: 12px;
+  padding: 0 20px;
+  border-right: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.brand-mark {
+  width: 11px;
+  height: 11px;
+  background: var(--accent);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: auto;
+}
+
+.toolbar-group {
+  display: flex;
+  height: 100%;
+  border-left: 1px solid var(--border);
+}
+
+.tool-button {
+  min-width: 48px;
+  height: 100%;
+  padding: 0 15px;
+  border: 0;
+  border-right: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.tool-button:hover, .tool-button.active {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.tool-button:disabled {
+  color: var(--grey-2);
+  cursor: not-allowed;
+}
+
+.tool-button:disabled:hover {
+  background: transparent;
+}
+
+.rehearsal-only {
+  display: none;
+}
+
+body.is-rehearsal .rehearsal-only {
+  display: flex;
+}
+
+.view {
+  position: absolute;
+  inset: 54px 0 0;
+}
+
+.overview {
+  display: grid;
+  grid-template-columns: minmax(285px, 25vw) 1fr;
+  min-height: 0;
+}
+
+.overview-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6vh 2.6vw 4vh;
+  border-right: 1px solid var(--border);
+  background: rgba(var(--paper-rgb), .76);
+}
+
+.eyebrow, .chrome, .node-index, .component-eyebrow, .drawer-meta, .scene-summary, .stat-unit, .stat-label, .table-card th, .quote-cite, .mode-note {
+  font-family: var(--mono);
+  font-size: clamp(11px, .78vw, 14px);
+  font-weight: 700;
+  letter-spacing: .13em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.overview-title {
+  margin: 2vh 0 0;
+  font-size: min(5.5vw, 8.5vh);
+  font-weight: 200;
+  letter-spacing: -.07em;
+  line-height: .94;
+}
+
+.overview-title em {
+  color: var(--accent);
+  font-weight: 300;
+}
+
+.overview-subtitle {
+  max-width: 22em;
+  margin: 3vh 0 0;
+  color: rgba(var(--ink-rgb), .64);
+  font-size: clamp(16px, 1.12vw, 21px);
+  line-height: 1.65;
+}
+
+.overview-legend {
+  display: grid;
+  gap: 12px;
+  color: rgba(var(--ink-rgb), .58);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legend-line {
+  width: 28px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.legend-node {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+
+.overview-viewport {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.overview-viewport.is-panning {
+  cursor: grabbing;
+}
+
+.overview-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  transition: transform .35s var(--ease);
+  will-change: transform;
+}
+
+.overview-viewport.is-panning .overview-stage {
+  transition: none;
+}
+
+.overview-stage::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle, rgba(var(--accent-rgb), .34) 1px, transparent 1.5px);
+  background-size: 24px 24px;
+  content: "";
+  opacity: .42;
+}
+
+.relations-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.relation-path {
+  fill: none;
+  stroke: rgba(var(--accent-rgb), .68);
+  stroke-width: .18;
+  stroke-dasharray: 1.15 .85;
+  marker-end: url(#arrow);
+}
+
+.relation-label {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 1.25px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: .72px;
+  text-anchor: middle;
+}
+
+.blueprint-node {
+  position: absolute;
+  width: clamp(140px, 12vw, 212px);
+  min-height: 98px;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--ink);
+  background: rgba(var(--paper-rgb), .94);
+  color: var(--ink);
+  text-align: left;
+  transition: transform .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
+}
+
+.blueprint-node:hover, .blueprint-node.is-active {
+  transform: translate(-50%, -50%) translateY(-7px);
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.blueprint-node.tone-ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.blueprint-node.tone-accent {
+  border-color: var(--accent);
+}
+
+.node-index {
+  display: block;
+  padding: 9px 12px 6px;
+  border-bottom: 1px solid currentColor;
+  opacity: .64;
+}
+
+.node-title {
+  display: block;
+  padding: 14px 12px 16px;
+  font-size: clamp(17px, 1.24vw, 23px);
+  font-weight: 500;
+  letter-spacing: -.04em;
+  line-height: 1.05;
+}
+
+.node-scene-marker {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+}
+
+.blueprint-node:hover .node-scene-marker, .blueprint-node.is-active .node-scene-marker {
+  background: var(--accent-on);
+}
+
+.preview-drawer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  width: min(410px, 92vw);
+  border-top: 1px solid var(--ink);
+  border-left: 1px solid var(--ink);
+  background: rgba(var(--paper-rgb), .98);
+  transform: translateX(102%);
+  transition: transform .32s var(--ease);
+}
+
+.preview-drawer.is-open {
+  transform: translateX(0);
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.drawer-close {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.drawer-body {
+  padding: 25px 22px 23px;
+}
+
+.drawer-title {
+  margin: 0;
+  font-size: clamp(28px, 2.2vw, 42px);
+  font-weight: 300;
+  letter-spacing: -.06em;
+}
+
+.drawer-summary {
+  margin: 17px 0 0;
+  color: rgba(var(--ink-rgb), .68);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.drawer-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 23px;
+}
+
+.primary-action, .secondary-action {
+  padding: 12px 15px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.secondary-action {
+  background: transparent;
+  color: var(--ink);
+}
+
+.scene {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  min-height: 0;
+  background: var(--paper);
+}
+
+.scene-rail {
+  display: flex;
+  flex-direction: column;
+  padding: 23px 20px 18px;
+  border-right: 1px solid var(--border);
+  background: var(--grey-1);
+}
+
+.rail-back {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.rail-title {
+  margin: 30px 0 0;
+  font-size: 29px;
+  font-weight: 300;
+  letter-spacing: -.06em;
+  line-height: .98;
+}
+
+.rail-summary {
+  margin: 18px 0 0;
+  color: rgba(var(--ink-rgb), .64);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.mini-map {
+  position: relative;
+  height: 160px;
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.mini-node {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%);
+  background: rgba(var(--ink-rgb), .4);
+}
+
+.mini-node.active {
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+}
+
+.scene-main {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.scene-main.is-panning {
+  cursor: grabbing;
+}
+
+.scene-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 48px 52px 52px;
+  background: var(--paper);
+  transform-origin: 0 0;
+  transition: transform .35s var(--ease);
+  will-change: transform;
+}
+
+.scene-main.is-panning .scene-stage {
+  transition: none;
+}
+
+.scene-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 490px);
+  gap: 38px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.scene-title {
+  margin: 10px 0 0;
+  max-width: 11em;
+  font-size: 82px;
+  font-weight: 200;
+  letter-spacing: -.085em;
+  line-height: .92;
+}
+
+.scene-summary {
+  align-self: end;
+  color: rgba(var(--ink-rgb), .6);
+  font-family: var(--sans);
+  font-size: clamp(15px, 1vw, 18px);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.65;
+  text-transform: none;
+}
+
+.scene-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  grid-template-rows: repeat(12, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 0;
+  margin-top: 18px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc((100% - 120px) / 16), var(--grid-line) calc((100% - 120px) / 16) calc((100% - 120px) / 16 + 1px)),
+    repeating-linear-gradient(0deg, transparent 0 calc((100% - 88px) / 12), var(--grid-line) calc((100% - 88px) / 12) calc((100% - 88px) / 12 + 1px));
+}
+
+.component {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: rgba(var(--paper-rgb), .96);
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+
+.component:hover {
+  border-color: rgba(var(--accent-rgb), .78);
+}
+
+body.is-rehearsal .component {
+  box-shadow: inset 0 3px 0 rgba(var(--accent-rgb), .8);
+}
+
+body.is-rehearsal .component.is-selected {
+  border-color: var(--accent);
+  box-shadow: inset 0 3px 0 var(--accent), 0 0 0 2px rgba(var(--accent-rgb), .22);
+}
+
+.component-inner {
+  height: 100%;
+  overflow: hidden;
+  padding: 18px;
+}
+
+.component-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.component-title {
+  margin: 4px 0 0;
+  font-size: clamp(18px, 1.45vw, 27px);
+  font-weight: 400;
+  letter-spacing: -.055em;
+  line-height: 1.06;
+}
+
+.component-eyebrow {
+  color: var(--accent);
+}
+
+.drag-handle {
+  display: none;
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--accent);
+  cursor: grab;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+body.is-rehearsal .drag-handle {
+  display: block;
+}
+
+.resize-handle {
+  display: none;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  width: 20px;
+  height: 20px;
+  border-top: 1px solid var(--accent);
+  border-left: 1px solid var(--accent);
+  background:
+    linear-gradient(135deg, transparent 0 52%, var(--accent) 52% 58%, transparent 58% 70%, var(--accent) 70% 76%, transparent 76%);
+  cursor: nwse-resize;
+}
+
+body.is-rehearsal .component.is-selected .resize-handle {
+  display: block;
+}
+
+.body-copy {
+  margin: 0;
+  color: rgba(var(--ink-rgb), .68);
+  font-size: clamp(15px, 1vw, 18px);
+  line-height: 1.68;
+}
+
+.bullet-list {
+  display: grid;
+  gap: 7px;
+  margin: 15px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bullet-list li {
+  position: relative;
+  padding-left: 18px;
+  color: rgba(var(--ink-rgb), .76);
+  font-size: clamp(14px, .9vw, 16px);
+  line-height: 1.5;
+}
+
+.bullet-list li::before {
+  position: absolute;
+  top: .62em;
+  left: 0;
+  width: 8px;
+  height: 2px;
+  background: var(--accent);
+  content: "";
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+  gap: 1px;
+  height: calc(100% - 51px);
+  background: var(--border);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 14px;
+  background: var(--grey-1);
+}
+
+.stat-value {
+  color: var(--accent);
+  font-size: clamp(44px, 5vw, 88px);
+  font-weight: 200;
+  letter-spacing: -.09em;
+  line-height: .82;
+}
+
+.stat-unit {
+  margin-left: 4px;
+  color: var(--ink);
+}
+
+.stat-label {
+  color: rgba(var(--ink-rgb), .58);
+}
+
+.table-card {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table-card th, .table-card td {
+  padding: 12px 9px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table-card th {
+  color: var(--accent);
+}
+
+.table-card td {
+  color: rgba(var(--ink-rgb), .76);
+  font-size: clamp(13px, .88vw, 16px);
+  line-height: 1.45;
+}
+
+.diagram-flow {
+  display: grid;
+  grid-template-columns: repeat(var(--diagram-count, 4), minmax(0, 1fr));
+  align-items: center;
+  gap: 16px;
+  height: calc(100% - 55px);
+}
+
+.diagram-node {
+  position: relative;
+  display: grid;
+  min-height: 84px;
+  place-items: center;
+  padding: 12px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  font-size: clamp(13px, .95vw, 18px);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.diagram-node:not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  right: -17px;
+  width: 17px;
+  height: 1px;
+  background: var(--accent);
+  content: "";
+}
+
+.diagram-node:not(:last-child)::before {
+  position: absolute;
+  top: calc(50% - 3px);
+  right: -17px;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-left: 5px solid var(--accent);
+  content: "";
+}
+
+.structure-map {
+  position: relative;
+  height: calc(100% - 55px);
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle, rgba(var(--accent-rgb), .24) 1px, transparent 1.4px);
+  background-size: 20px 20px;
+}
+
+.structure-relations-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.structure-relation-path {
+  fill: none;
+  stroke: rgba(var(--accent-rgb), .76);
+  stroke-width: .34;
+  stroke-dasharray: 1.5 .9;
+}
+
+.structure-relation-label {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 2.2px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 1px;
+  text-anchor: middle;
+}
+
+.structure-node {
+  position: absolute;
+  width: 150px;
+  min-height: 74px;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--ink);
+  background: rgba(var(--paper-rgb), .96);
+  color: var(--ink);
+  text-align: left;
+  transition: transform .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
+}
+
+.structure-node:hover, .structure-node.is-active {
+  transform: translate(-50%, -50%) translateY(-5px);
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.structure-node.tone-ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.structure-node-index {
+  display: block;
+  padding: 7px 10px 5px;
+  border-bottom: 1px solid currentColor;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  opacity: .62;
+}
+
+.structure-node-title {
+  display: block;
+  padding: 11px 10px 13px;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -.035em;
+  line-height: 1.08;
+}
+
+.quote-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 19px;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.component-quote .drag-handle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 6;
+  background: var(--paper);
+}
+
+.quote-mark {
+  color: var(--accent);
+  font-family: Georgia, serif;
+  font-size: 60px;
+  line-height: .65;
+}
+
+.quote-copy {
+  margin: 7px 0 0;
+  font-size: clamp(20px, 2vw, 35px);
+  font-weight: 300;
+  letter-spacing: -.06em;
+  line-height: 1.15;
+}
+
+.quote-cite {
+  margin-top: 16px;
+  color: rgba(255, 255, 255, .58);
+}
+
+.link-list {
+  display: grid;
+  gap: 8px;
+}
+
+.link-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  font-size: clamp(15px, 1vw, 18px);
+  text-align: left;
+}
+
+.link-button::after {
+  color: var(--accent);
+  content: "↗";
+  font-size: 20px;
+}
+
+.link-button:hover {
+  color: var(--accent);
+}
+
+.image-wrap {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: calc(100% - 55px);
+}
+
+.image-wrap img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+}
+
+.image-wrap img.fit-contain {
+  object-fit: contain;
+}
+
+.image-caption {
+  padding-top: 9px;
+  color: rgba(var(--ink-rgb), .58);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+[data-edit-key] {
+  border-radius: 0;
+}
+
+body.is-rehearsal [data-edit-key]:hover {
+  box-shadow: inset 0 -1px 0 var(--accent);
+}
+
+[contenteditable="true"] {
+  background: rgba(var(--accent-rgb), .09);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 80;
+  max-width: min(420px, 90vw);
+  padding: 13px 16px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.45;
+  text-transform: uppercase;
+  transform: translateY(130%);
+  transition: transform .22s var(--ease);
+}
+
+.toast.is-visible {
+  transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+  .brand {
+    min-width: auto;
+  }
+
+  .brand span:last-child, .tool-button .long-label {
+    display: none;
+  }
+
+  .overview {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-copy {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 5;
+    width: min(330px, calc(100vw - 36px));
+    padding: 18px;
+    border: 1px solid var(--border);
+    pointer-events: none;
+  }
+
+  .overview-title {
+    font-size: 48px;
+  }
+
+  .overview-subtitle, .overview-legend {
+    display: none;
+  }
+
+  .scene {
+    grid-template-columns: 1fr;
+  }
+
+  .scene-rail {
+    display: none;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+</style>
+</head>
+<body>
+  <main id="app" aria-live="polite"></main>
+  <script data-blueprint-config>
+window.BLUEPRINT_CONFIG = {
+  title: 'Blueprint Skill Manual',
+  subtitle: '一份用蓝图解释蓝图的结构化说明书',
+  meta: 'BLUEPRINT PRESENTATION / SELF-DOCUMENTING DEMO',
+  overview: {
+    type: 'dag',
+    width: 1440,
+    height: 900
+  },
+  ui: {
+    defaultLanguage: 'zh-CN',
+    languages: ['zh-CN', 'en'],
+    languageLabels: { 'zh-CN': '中文', en: 'EN' }
+  },
+  nodes: [
+    {
+      id: 'entry',
+      title: '为什么不是 PPT',
+      summary: '传统幻灯片从第一页开始。蓝图先把论述结构交给观众，再进入局部。',
+      scene: 'architecture-scene',
+      x: 11,
+      y: 50,
+      tone: 'ink'
+    },
+    {
+      id: 'structure',
+      title: '全局蓝图',
+      summary: '结构可以是思维导图、DAG 或列表。点击节点，只是展开摘要和场景入口。',
+      scene: 'architecture-scene',
+      x: 32,
+      y: 29,
+      tone: 'accent'
+    },
+    {
+      id: 'components',
+      title: '自由组件',
+      summary: '文字、表格、指标、示意图、引用、链接和图片，都作为局部证据块存在。',
+      scene: 'components-scene',
+      x: 53,
+      y: 50
+    },
+    {
+      id: 'modes',
+      title: '两种模式',
+      summary: '演示模式保持锁定。预演模式只开放最后一公里的校准能力。',
+      scene: 'modes-scene',
+      x: 73,
+      y: 29,
+      tone: 'accent'
+    },
+    {
+      id: 'persistence',
+      title: '保存覆盖层',
+      summary: '本地配置仍然是主源。浏览器调整保存为小型覆盖文件，便于审阅和回填。',
+      scene: 'persistence-scene',
+      x: 73,
+      y: 72
+    },
+    {
+      id: 'delivery',
+      title: '单文件交付',
+      summary: '确认后的蓝图可以打包成独立 HTML，直接投屏、分享或部署。',
+      scene: 'delivery-scene',
+      x: 92,
+      y: 50,
+      tone: 'ink'
+    }
+  ],
+  relations: [
+    { from: 'entry', to: 'structure', label: '先展开全貌' },
+    { from: 'structure', to: 'components', label: '再进入细节' },
+    { from: 'components', to: 'modes', label: '预演校准' },
+    { from: 'modes', to: 'persistence', label: '保存调整' },
+    { from: 'persistence', to: 'delivery', label: '冻结交付' },
+    { from: 'structure', to: 'delivery', label: '结构始终可见' }
+  ],
+  scenes: [
+    {
+      id: 'architecture-scene',
+      node: 'structure',
+      canvas: { width: 1600, height: 1000 },
+      eyebrow: 'SCENE 01 / ARCHITECTURE',
+      title: '先看全局，再进入局部。',
+      summary: '蓝图不是带思维导图的 PPT。思维导图、DAG 或列表都可以成为首页、目录、导航和位置提示。',
+      components: [
+        {
+          id: 'architecture-claim',
+          type: 'text',
+          eyebrow: 'CORE IDEA',
+          title: '把“翻页”改造成“探索”。',
+          body: '观众进入蓝图后，首先看到完整的论述链条。总览使用独立画布，初次打开自动适应视口；放大后可以拖动画布继续探索。',
+          bullets: ['结构形式服从内容', '节点承担结构位置', '场景承担局部展开', '组件承担证据展示'],
+          slot: { x: 1, y: 1, w: 7, h: 6 }
+        },
+        {
+          id: 'architecture-diagram',
+          type: 'structure',
+          eyebrow: 'FOUR-LAYER MODEL',
+          title: '结构化展示模型',
+          structureType: 'dag',
+          nodes: [
+            { id: 'overview', title: '全局蓝图', summary: '第一层先交代完整论述结构。', x: 10, y: 50 },
+            { id: 'node', title: '节点概览', summary: '点击节点展开摘要与下一层入口。', x: 37, y: 50 },
+            { id: 'scene', title: '局部场景', summary: '局部场景仍然是可平移、可缩放的画布。', scene: 'local-structure-scene', x: 64, y: 50 },
+            { id: 'component', title: '证据组件', summary: '文字、表格、图片和结构图都只是画布中的组件。', scene: 'components-scene', x: 90, y: 50 }
+          ],
+          relations: [
+            { from: 'overview', to: 'node', label: '点击展开' },
+            { from: 'node', to: 'scene', label: '进入局部' },
+            { from: 'scene', to: 'component', label: '组织证据' }
+          ],
+          slot: { x: 9, y: 1, w: 8, h: 6 }
+        },
+        {
+          id: 'architecture-quote',
+          type: 'quote',
+          quote: '思维导图负责提示位置，组件负责展开证据。',
+          cite: 'BLUEPRINT PRINCIPLE / 01',
+          slot: { x: 4, y: 8, w: 10, h: 4 }
+        }
+      ]
+    },
+    {
+      id: 'local-structure-scene',
+      node: 'structure',
+      canvas: { width: 1800, height: 1100 },
+      eyebrow: 'SCENE 02 / RECURSIVE CANVAS',
+      title: '局部画布仍然可以继续展开。',
+      summary: '第二层、第三层或更深层都不是固定幻灯片。它们仍然可以包含结构图与自由组件，并继续下钻。',
+      components: [
+        {
+          id: 'local-structure-map',
+          type: 'structure',
+          eyebrow: 'NESTED STRUCTURE',
+          title: '局部结构图也是正式组件',
+          structureType: 'mind-map',
+          nodes: [
+            { id: 'canvas', title: '局部画布', summary: '每一层都有自己的正常比例与独立视角。', x: 12, y: 52, tone: 'ink' },
+            { id: 'map', title: '结构图组件', summary: '结构图可以是思维导图、DAG 或列表。', x: 38, y: 28, tone: 'accent' },
+            { id: 'evidence', title: '证据组件', summary: '结构图可以与文字、表格、图片并置。', scene: 'components-scene', x: 62, y: 56 },
+            { id: 'deeper', title: '继续下钻', summary: '点击后进入更深层场景，返回时仍回到当前层。', scene: 'modes-scene', x: 88, y: 30, tone: 'accent' }
+          ],
+          relations: [
+            { from: 'canvas', to: 'map', label: '容纳' },
+            { from: 'map', to: 'evidence', label: '组织' },
+            { from: 'map', to: 'deeper', label: '继续展开' }
+          ],
+          slot: { x: 1, y: 1, w: 16, h: 7 }
+        },
+        {
+          id: 'local-structure-copy',
+          type: 'text',
+          eyebrow: 'RECURSIVE RULE',
+          title: '任何层级都保持画布语义。',
+          body: '画布进入时自动适应视口，放大后可以拖动探索。预演模式只是在此基础上增加组件位置校准，不改变浏览模型。',
+          bullets: ['局部画布可平移与缩放', '结构图节点可继续进入下一层', '返回按钮回到直接上一级'],
+          slot: { x: 3, y: 9, w: 12, h: 3 }
+        }
+      ]
+    },
+    {
+      id: 'components-scene',
+      node: 'components',
+      eyebrow: 'SCENE 03 / COMPONENTIZATION',
+      title: '组件是细节，不是页面。',
+      summary: '每个组件只负责一种表达任务。它们由本地配置决定，并吸附到统一的大屏网格。',
+      components: [
+        {
+          id: 'component-stats',
+          type: 'stats',
+          eyebrow: 'SYSTEM CONTRACT',
+          title: '受控的自由度',
+          items: [
+            { value: '08', unit: '类', label: '首批组件' },
+            { value: '16', unit: '列', label: '水平网格' },
+            { value: '12', unit: '行', label: '垂直坐标' }
+          ],
+          slot: { x: 1, y: 1, w: 7, h: 5 }
+        },
+        {
+          id: 'component-table',
+          type: 'table',
+          eyebrow: 'REGISTERED TYPES',
+          title: '首批组件注册表',
+          columns: ['组件', '适合表达', '预演可改'],
+          rows: [
+            ['text / quote', '观点与语境', '短文本'],
+            ['stats / table', '指标与对比', '数值和单元格'],
+            ['diagram / image', '静态关系与证据', '标签和说明'],
+            ['structure', '递归结构导航', '节点标题'],
+            ['links', '继续探索', '链接文字']
+          ],
+          slot: { x: 9, y: 1, w: 8, h: 7 }
+        },
+        {
+          id: 'component-image',
+          type: 'image',
+          eyebrow: 'EVIDENCE BLOCK',
+          title: '图片也是结构中的证据块',
+          src: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDUwMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgogIDx0aXRsZSBpZD0idGl0bGUiPkJsdWVwcmludCBzdHJ1Y3R1cmUgZGlhZ3JhbTwvdGl0bGU+CiAgPGRlc2MgaWQ9ImRlc2MiPkEgU3dpc3Mtc3R5bGUgY2hhaW4gc2hvd2luZyBvdmVydmlldywgbm9kZSwgc2NlbmUsIGFuZCBjb21wb25lbnQgYmxvY2tzLjwvZGVzYz4KICA8cmVjdCB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmYWZhZjgiLz4KICA8ZyBzdHJva2U9IiNkNGQ0ZDIiIHN0cm9rZS13aWR0aD0iMSI+CiAgICA8cGF0aCBkPSJNMCA1MGgxMjAwTTAgMTAwaDEyMDBNMCAxNTBoMTIwME0wIDIwMGgxMjAwTTAgMjUwaDEyMDBNMCAzMDBoMTIwME0wIDM1MGgxMjAwTTAgNDAwaDEyMDBNMCA0NTBoMTIwMCIvPgogICAgPHBhdGggZD0iTTUwIDB2NTAwTTEwMCAwdjUwME0xNTAgMHY1MDBNMjAwIDB2NTAwTTI1MCAwdjUwME0zMDAgMHY1MDBNMzUwIDB2NTAwTTQwMCAwdjUwME00NTAgMHY1MDBNNTAwIDB2NTAwTTU1MCAwdjUwME02MDAgMHY1MDBNNjUwIDB2NTAwTTcwMCAwdjUwME03NTAgMHY1MDBNODAwIDB2NTAwTTg1MCAwdjUwME05MDAgMHY1MDBNOTUwIDB2NTAwTTEwMDAgMHY1MDBNMTA1MCAwdjUwME0xMTAwIDB2NTAwTTExNTAgMHY1MDAiLz4KICA8L2c+CiAgPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAyZmE3IiBzdHJva2Utd2lkdGg9IjgiPgogICAgPHBhdGggZD0iTTI0NSAyNTBoMTA1TTU0NSAyNTBoMTA1TTg0NSAyNTBoMTA1Ii8+CiAgPC9nPgogIDxnIGZpbGw9IiMwMDJmYTciPgogICAgPHBhdGggZD0iTTM1MCAyNTBsLTIyLTE0djI4ek02NTAgMjUwbC0yMi0xNHYyOHpNOTUwIDI1MGwtMjItMTR2Mjh6Ii8+CiAgPC9nPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzNCIgZm9udC13ZWlnaHQ9IjcwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICA8Zz4KICAgICAgPHJlY3QgeD0iNTUiIHk9IjE1NSIgd2lkdGg9IjE5MCIgaGVpZ2h0PSIxOTAiIGZpbGw9IiMwYTBhMGEiLz4KICAgICAgPHRleHQgeD0iMTUwIiB5PSIyNDIiIGZpbGw9IiNmYWZhZjgiPk9WRVJWSUVXPC90ZXh0PgogICAgICA8dGV4dCB4PSIxNTAiIHk9IjI4NSIgZmlsbD0iI2ZhZmFmOCI+5YWo5bGA57uT5p6EPC90ZXh0PgogICAgPC9nPgogICAgPGc+CiAgICAgIDxyZWN0IHg9IjM1NSIgeT0iMTU1IiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjE5MCIgZmlsbD0iI2ZhZmFmOCIgc3Ryb2tlPSIjMGEwYTBhIiBzdHJva2Utd2lkdGg9IjQiLz4KICAgICAgPHRleHQgeD0iNDUwIiB5PSIyNDIiIGZpbGw9IiMwYTBhMGEiPk5PREU8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjQ1MCIgeT0iMjg1IiBmaWxsPSIjMGEwYTBhIj7oioLngrnmpoLop4g8L3RleHQ+CiAgICA8L2c+CiAgICA8Zz4KICAgICAgPHJlY3QgeD0iNjU1IiB5PSIxNTUiIHdpZHRoPSIxOTAiIGhlaWdodD0iMTkwIiBmaWxsPSIjMDAyZmE3Ii8+CiAgICAgIDx0ZXh0IHg9Ijc1MCIgeT0iMjQyIiBmaWxsPSIjZmZmZmZmIj5TQ0VORTwvdGV4dD4KICAgICAgPHRleHQgeD0iNzUwIiB5PSIyODUiIGZpbGw9IiNmZmZmZmYiPuWxgOmDqOWcuuaZrzwvdGV4dD4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cmVjdCB4PSI5NTUiIHk9IjE1NSIgd2lkdGg9IjE5MCIgaGVpZ2h0PSIxOTAiIGZpbGw9IiNmYWZhZjgiIHN0cm9rZT0iIzBhMGEwYSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgICAgIDx0ZXh0IHg9IjEwNTAiIHk9IjI0MiIgZmlsbD0iIzBhMGEwYSI+QkxPQ0s8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjEwNTAiIHk9IjI4NSIgZmlsbD0iIzBhMGEwYSI+6K+B5o2u57uE5Lu2PC90ZXh0PgogICAgPC9nPgogIDwvZz4KPC9zdmc+Cg==',
+          alt: 'A Swiss-style diagram showing overview, node, scene, and component blocks.',
+          caption: 'LOCAL SVG / PACKED INTO SINGLE HTML',
+          fit: 'contain',
+          slot: { x: 1, y: 7, w: 7, h: 5 }
+        },
+        {
+          id: 'component-links',
+          type: 'links',
+          eyebrow: 'NEXT',
+          title: '继续探索',
+          items: [
+            { label: '查看两种运行模式', scene: 'modes-scene' },
+            { label: '返回全局蓝图', action: 'overview' }
+          ],
+          slot: { x: 9, y: 9, w: 8, h: 3 }
+        }
+      ]
+    },
+    {
+      id: 'modes-scene',
+      node: 'modes',
+      eyebrow: 'SCENE 04 / TWO MODES',
+      title: '展示和校准，必须分开。',
+      summary: '蓝图在浏览器里提供两种模式，但不会演化成一个在线制作工具。',
+      components: [
+        {
+          id: 'modes-table',
+          type: 'table',
+          eyebrow: 'MODE COMPARISON',
+          title: '演示模式与预演模式',
+          columns: ['能力', '演示模式', '预演模式'],
+          rows: [
+            ['节点与场景跳转', '允许', '允许'],
+            ['组件拖动与缩放', '锁定', '允许，吸附网格'],
+            ['少量文本修订', '锁定', '双击后编辑'],
+            ['界面语言切换', '允许', '允许'],
+            ['新增或删除组件', '不允许', '不允许']
+          ],
+          slot: { x: 1, y: 1, w: 9, h: 7 }
+        },
+        {
+          id: 'modes-boundary',
+          type: 'text',
+          eyebrow: 'BOUNDARY',
+          title: '预演模式只负责最后一公里。',
+          body: '组件数量、类型、关系、素材和主题仍然在本地配置中维护。浏览器只承担布局校准和短文本修订。',
+          bullets: ['场景返回遵循进入路径', '拖动和缩放自动吸附网格', '界面按钮可以切换语言', '保存结果可以审阅'],
+          slot: { x: 11, y: 1, w: 6, h: 7 }
+        },
+        {
+          id: 'modes-quote',
+          type: 'quote',
+          quote: '布局合理时，尽量少拖。',
+          cite: 'OPERATING RULE / 02',
+          slot: { x: 4, y: 9, w: 10, h: 3 }
+        }
+      ]
+    },
+    {
+      id: 'persistence-scene',
+      node: 'persistence',
+      eyebrow: 'SCENE 05 / SAVE MODEL',
+      title: '保存的是覆盖层，不是混乱。',
+      summary: '浏览器调整与本地源配置解耦。每次保存仍然是一个可以阅读、审阅和回填的小文件。',
+      components: [
+        {
+          id: 'persistence-diagram',
+          type: 'diagram',
+          eyebrow: 'LOAD ORDER',
+          title: '配置加载顺序',
+          nodes: [
+            { id: 'config', label: '本地配置' },
+            { id: 'file', label: '覆盖文件' },
+            { id: 'draft', label: '浏览器草稿' },
+            { id: 'artifact', label: '单文件产物' }
+          ],
+          edges: [['config', 'file'], ['file', 'draft'], ['draft', 'artifact']],
+          slot: { x: 1, y: 1, w: 16, h: 4 }
+        },
+        {
+          id: 'persistence-copy',
+          type: 'text',
+          eyebrow: 'SOURCE OF TRUTH',
+          title: '配置文件仍然是主源。',
+          body: '预演模式中的修改先写入 localStorage。点击保存后，浏览器输出 blueprint-overrides.json。确认后的覆盖文件放回项目目录，再进入最终打包。',
+          bullets: ['草稿可刷新恢复', '覆盖文件保持小而清晰', '打包前可以人工检查'],
+          slot: { x: 1, y: 6, w: 9, h: 6 }
+        },
+        {
+          id: 'persistence-stats',
+          type: 'stats',
+          eyebrow: 'DELIVERABLES',
+          title: '三层文件关系',
+          items: [
+            { value: '01', unit: '份', label: '源配置' },
+            { value: '01', unit: '份', label: '覆盖文件' },
+            { value: '01', unit: '个', label: '最终 HTML' }
+          ],
+          slot: { x: 11, y: 6, w: 6, h: 6 }
+        }
+      ]
+    },
+    {
+      id: 'delivery-scene',
+      node: 'delivery',
+      eyebrow: 'SCENE 06 / DELIVERY',
+      title: '制作目录继续迭代，单个 HTML 对外交付。',
+      summary: '源项目保留全部配置和素材。打包器将 CSS、运行时、覆盖配置和本地图片内联为一个文件。',
+      components: [
+        {
+          id: 'delivery-copy',
+          type: 'text',
+          eyebrow: 'SOURCE PROJECT',
+          title: '项目目录用于继续修改。',
+          body: '初始化脚本会生成 index.html、blueprint.config.js、blueprint-overrides.json、样式、运行时和 images 目录。',
+          bullets: ['编辑配置', '本地预览', '校验结构', '打包交付'],
+          slot: { x: 1, y: 1, w: 7, h: 7 }
+        },
+        {
+          id: 'delivery-image',
+          type: 'image',
+          eyebrow: 'PACKED ARTIFACT',
+          title: '最终只有一个 blueprint.html',
+          src: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDUwMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIGRlc2MiPgogIDx0aXRsZSBpZD0idGl0bGUiPkJsdWVwcmludCBzdHJ1Y3R1cmUgZGlhZ3JhbTwvdGl0bGU+CiAgPGRlc2MgaWQ9ImRlc2MiPkEgU3dpc3Mtc3R5bGUgY2hhaW4gc2hvd2luZyBvdmVydmlldywgbm9kZSwgc2NlbmUsIGFuZCBjb21wb25lbnQgYmxvY2tzLjwvZGVzYz4KICA8cmVjdCB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmYWZhZjgiLz4KICA8ZyBzdHJva2U9IiNkNGQ0ZDIiIHN0cm9rZS13aWR0aD0iMSI+CiAgICA8cGF0aCBkPSJNMCA1MGgxMjAwTTAgMTAwaDEyMDBNMCAxNTBoMTIwME0wIDIwMGgxMjAwTTAgMjUwaDEyMDBNMCAzMDBoMTIwME0wIDM1MGgxMjAwTTAgNDAwaDEyMDBNMCA0NTBoMTIwMCIvPgogICAgPHBhdGggZD0iTTUwIDB2NTAwTTEwMCAwdjUwME0xNTAgMHY1MDBNMjAwIDB2NTAwTTI1MCAwdjUwME0zMDAgMHY1MDBNMzUwIDB2NTAwTTQwMCAwdjUwME00NTAgMHY1MDBNNTAwIDB2NTAwTTU1MCAwdjUwME02MDAgMHY1MDBNNjUwIDB2NTAwTTcwMCAwdjUwME03NTAgMHY1MDBNODAwIDB2NTAwTTg1MCAwdjUwME05MDAgMHY1MDBNOTUwIDB2NTAwTTEwMDAgMHY1MDBNMTA1MCAwdjUwME0xMTAwIDB2NTAwTTExNTAgMHY1MDAiLz4KICA8L2c+CiAgPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAyZmE3IiBzdHJva2Utd2lkdGg9IjgiPgogICAgPHBhdGggZD0iTTI0NSAyNTBoMTA1TTU0NSAyNTBoMTA1TTg0NSAyNTBoMTA1Ii8+CiAgPC9nPgogIDxnIGZpbGw9IiMwMDJmYTciPgogICAgPHBhdGggZD0iTTM1MCAyNTBsLTIyLTE0djI4ek02NTAgMjUwbC0yMi0xNHYyOHpNOTUwIDI1MGwtMjItMTR2Mjh6Ii8+CiAgPC9nPgogIDxnIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzNCIgZm9udC13ZWlnaHQ9IjcwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICA8Zz4KICAgICAgPHJlY3QgeD0iNTUiIHk9IjE1NSIgd2lkdGg9IjE5MCIgaGVpZ2h0PSIxOTAiIGZpbGw9IiMwYTBhMGEiLz4KICAgICAgPHRleHQgeD0iMTUwIiB5PSIyNDIiIGZpbGw9IiNmYWZhZjgiPk9WRVJWSUVXPC90ZXh0PgogICAgICA8dGV4dCB4PSIxNTAiIHk9IjI4NSIgZmlsbD0iI2ZhZmFmOCI+5YWo5bGA57uT5p6EPC90ZXh0PgogICAgPC9nPgogICAgPGc+CiAgICAgIDxyZWN0IHg9IjM1NSIgeT0iMTU1IiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjE5MCIgZmlsbD0iI2ZhZmFmOCIgc3Ryb2tlPSIjMGEwYTBhIiBzdHJva2Utd2lkdGg9IjQiLz4KICAgICAgPHRleHQgeD0iNDUwIiB5PSIyNDIiIGZpbGw9IiMwYTBhMGEiPk5PREU8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjQ1MCIgeT0iMjg1IiBmaWxsPSIjMGEwYTBhIj7oioLngrnmpoLop4g8L3RleHQ+CiAgICA8L2c+CiAgICA8Zz4KICAgICAgPHJlY3QgeD0iNjU1IiB5PSIxNTUiIHdpZHRoPSIxOTAiIGhlaWdodD0iMTkwIiBmaWxsPSIjMDAyZmE3Ii8+CiAgICAgIDx0ZXh0IHg9Ijc1MCIgeT0iMjQyIiBmaWxsPSIjZmZmZmZmIj5TQ0VORTwvdGV4dD4KICAgICAgPHRleHQgeD0iNzUwIiB5PSIyODUiIGZpbGw9IiNmZmZmZmYiPuWxgOmDqOWcuuaZrzwvdGV4dD4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cmVjdCB4PSI5NTUiIHk9IjE1NSIgd2lkdGg9IjE5MCIgaGVpZ2h0PSIxOTAiIGZpbGw9IiNmYWZhZjgiIHN0cm9rZT0iIzBhMGEwYSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgICAgIDx0ZXh0IHg9IjEwNTAiIHk9IjI0MiIgZmlsbD0iIzBhMGEwYSI+QkxPQ0s8L3RleHQ+CiAgICAgIDx0ZXh0IHg9IjEwNTAiIHk9IjI4NSIgZmlsbD0iIzBhMGEwYSI+6K+B5o2u57uE5Lu2PC90ZXh0PgogICAgPC9nPgogIDwvZz4KPC9zdmc+Cg==',
+          alt: 'A Swiss-style chain showing how the Blueprint artifact is structured.',
+          caption: 'CSS + JS + OVERRIDES + LOCAL IMAGES / INLINE',
+          fit: 'contain',
+          slot: { x: 9, y: 1, w: 8, h: 6 }
+        },
+        {
+          id: 'delivery-quote',
+          type: 'quote',
+          quote: '源项目用于修改，单个 HTML 用于交付。',
+          cite: 'DELIVERY RULE / 03',
+          slot: { x: 1, y: 9, w: 7, h: 3 }
+        },
+        {
+          id: 'delivery-links',
+          type: 'links',
+          eyebrow: 'REVIEW AGAIN',
+          title: '继续查看',
+          items: [
+            { label: '回到保存机制', scene: 'persistence-scene' },
+            { label: '回到全局蓝图', action: 'overview' }
+          ],
+          slot: { x: 9, y: 8, w: 8, h: 4 }
+        }
+      ]
+    }
+  ]
+};
+
+window.BLUEPRINT_PACKED = true;
+window.BLUEPRINT_OVERRIDES = {}
+;
+</script>
+  <script data-blueprint-runtime>
 /*
  * Blueprint Presentation - AGPL-3.0
  * Adapts Swiss visual-system ideas from https://github.com/op7418/guizang-ppt-skill
@@ -1197,3 +2606,7 @@
     render();
   });
 })();
+
+</script>
+</body>
+</html>

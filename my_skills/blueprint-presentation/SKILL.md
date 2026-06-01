@@ -1,11 +1,11 @@
 ---
 name: blueprint-presentation
-description: Create structured, component-based HTML presentations called Blueprints. Use when Codex needs to build an explorable large-screen presentation with a global mind-map overview, linked nodes, scene navigation, reusable content components, a locked presentation mode, and a lightweight rehearsal mode for dragging, resizing, editing selected text, persisting adjustments, and saving layout overrides. Use for requests mentioning 蓝图, 结构化大屏, 思维导图演示, component-based presentation, explorable HTML deck, or a non-linear alternative to PPT.
+description: Create structured, component-based HTML presentations called Blueprints. Use when Codex needs to build an explorable large-screen presentation with a pannable global structure canvas, recursive pannable local canvases, mind-map, DAG, or list structures at any depth, hierarchical scene navigation, reusable content components, configurable interface languages, a locked presentation mode, and a lightweight rehearsal mode for dragging, resizing, editing selected text, persisting adjustments, and saving layout overrides. Use for requests mentioning 蓝图, 结构化大屏, 思维导图演示, component-based presentation, explorable HTML deck, or a non-linear alternative to PPT.
 ---
 
 # Blueprint Presentation
 
-Build a Blueprint as a local-configured HTML presentation. Treat the global structure map as the primary interface, scenes as focused expansions of nodes, and components as evidence blocks inside each scene.
+Build a Blueprint as a local-configured HTML presentation. Treat the global structure map as the primary interface, scenes as pannable local canvases that recursively expand nodes, and components as evidence blocks or nested structures inside each scene.
 
 ## Start Here
 
@@ -25,7 +25,7 @@ node <SKILL_ROOT>/scripts/init-blueprint.mjs path/to/project
 node <SKILL_ROOT>/scripts/validate-blueprint.mjs path/to/project
 ```
 
-7. Preview with a local server:
+7. Preview the editable source during development with a local server:
 
 ```bash
 cd path/to/project
@@ -38,6 +38,8 @@ python3 -m http.server 4173
 ```bash
 node <SKILL_ROOT>/scripts/pack-blueprint.mjs path/to/project
 ```
+
+10. Deliver `path/to/project/blueprint.html`. The viewer opens this file directly; no server command is required.
 
 ## Product Boundary
 
@@ -52,9 +54,11 @@ Do not implement browser-side node, scene, or component creation and deletion. D
 
 Use `Blueprint Swiss` as the default and only first-party visual system. Preserve the upstream Swiss discipline: one saturated accent color, rectilinear geometry, fine rules, a visible structural grid, large light-weight headings, restrained motion, and mono metadata.
 
-Prefer a strong initial layout so rehearsal adjustments remain exceptional. Use a 16-column by 12-row scene grid. Make scene components snap to the grid. Keep the overview readable without requiring node clicks: relations and chain direction must remain visible on the canvas.
+Choose `overview.type` from `mind-map`, `dag`, or `list` according to the content. Give the overview its own canvas dimensions. The initial view fits the canvas, while zooming may intentionally move content beyond the viewport; viewers can pan the canvas to inspect it.
 
-Use the component registry in `references/component-contracts.md`. Add a component type only when it recurs across Blueprints and has a clear data contract.
+Prefer a strong initial layout so rehearsal adjustments remain exceptional. Give each scene its own fixed-size canvas, fit it on entry, and allow viewers to pan and zoom it in presentation mode. Use a 16-column by 12-row scene grid. Make scene components snap to the grid. Keep the overview readable without requiring node clicks: relations and chain direction must remain visible on the canvas when the structure uses relations.
+
+Use the component registry in `references/component-contracts.md`. Use `structure` when a scene needs a mind-map, DAG, or list that continues into deeper scenes. Add another component type only when it recurs across Blueprints and has a clear data contract.
 
 ## Content Workflow
 
@@ -66,6 +70,7 @@ Before writing config, define:
 4. Which evidence components each scene needs.
 5. The layout slot for each component.
 6. The short text fields that may be refined during rehearsal.
+7. The default interface language and optional language switcher choices.
 
 Keep the overview map concise. Use scenes for detail. Use components to support a node, not to recreate a conventional slide full of unrelated boxes.
 

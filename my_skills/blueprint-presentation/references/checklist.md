@@ -17,9 +17,15 @@
 - Components do not drag, resize, or expose editing affordances.
 - Nodes open preview cards.
 - Scene links work.
+- Scene canvases fit on entry, then pan and zoom without compressing their contents.
+- Nested `structure` components can open deeper scenes.
 - Returning to overview restores context.
 - Keyboard focus is visible.
-- Zoom controls work on the overview.
+- Initial load fits the complete overview canvas.
+- Zoom controls preserve normal proportions.
+- Dragging empty overview space pans the canvas after zooming.
+- Back returns one level through nested scene navigation.
+- Configured interface languages switch toolbar, preview, rail, and feedback labels.
 
 ## Rehearsal Mode
 
@@ -36,6 +42,6 @@
 
 - `validate-blueprint.mjs` passes without errors.
 - Saved overrides have been reviewed.
-- `pack-blueprint.mjs` creates `dist/blueprint.html`.
-- The packed HTML opens and behaves like the source project.
+- `pack-blueprint.mjs` creates `blueprint.html` in the project root.
+- The packed HTML opens directly and behaves like the source project without a server.
 - `LICENSE` and `references/upstream.md` remain in redistributed skill copies.
