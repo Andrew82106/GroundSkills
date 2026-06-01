@@ -10,3 +10,4 @@ node_modules/
 *.doc
 my_skills/side
 .claude
+.agents/

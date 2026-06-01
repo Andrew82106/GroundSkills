@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blueprint Presentation"
+  short_description: "Build structured HTML blueprint presentations"
+  default_prompt: "Use $blueprint-presentation to create a structured HTML blueprint presentation with an overview map and rehearsal mode."

@@ -9,6 +9,7 @@
 | **[detailed-docx](my_skills/detailed-docx/SKILL.md)** | Word 文档精细操作。支持创建、读取、编辑、删除，保留原有格式（字体/颜色/图片/合并单元格），含跨 Run 替换、增量格式叠加、分栏布局、三线表、LaTeX 公式（含编号公式）及表格单元格公式插入。公式引擎支持 pandoc / latex2mathml 双路径，覆盖双栏论文投稿全场景。 | `python-docx` `pandoc`（推荐） |
 | **[sci-group-read](my_skills/sci-group-read/SKILL.md)** | 学术论文系统化分析。4 阶段流水线：PDF 解析 → 结构化提取 → 单篇深度分析 → 跨论文领域综述。 | `PyPDF2` `pdfplumber` `PyMuPDF` |
 | **[html-presentation](my_skills/html-presentation-skill/SKILL.md)** | HTML 演示文稿生成。从 Markdown 或主题快速生成精美的 HTML 幻灯片。 | `Python 3.8+` |
+| **[blueprint-presentation](my_skills/blueprint-presentation/SKILL.md)** | 蓝图式 HTML 大屏展示。以全局思维导图组织结构，以场景和自由组件展开细节；提供锁定的演示模式，以及支持拖动、缩放、少量文本修订、持久化和覆盖文件保存的预演模式。 | `Node.js 18+` |
 | **[document-format-skills](my_skills/document-format-skills-main/SKILL.md)** | 文档格式处理。格式诊断、标点修复、样式统一，输入杂乱文档输出规范 docx。 | — |
 | **[lightread-cli](my_skills/lightread-cli/SKILL.md)** | LightRead CLI (`lr`) 集成。支持学术文献搜索、网页读取、资料库管理、笔记库维护及自动引用生成。 | `Node.js` |
 | **[my-paper-polish-skills](my_skills/my-paper-polish-skills/SKILL.md)** | 学术论文精修与 LaTeX 辅助。执行无粗体/无冒号/无括注/禁忌短语等硬规则，含一致性自检、表格溢出防护、编辑启发式扫描及 Skill 自更新循环；支持句段润色、全节重写和纯审阅三种响应模式。 | — |
@@ -20,6 +21,23 @@
 
 每个 Skill 目录下的 `SKILL.md` 包含完整的使用指南。AI Agent 会自动识别并加载相关 Skill。
 
+### Blueprint Presentation
+
+`blueprint-presentation` 不是传统分页 PPT，而是一套由本地配置驱动的结构化大屏展示方案。初始化项目后，编辑 `blueprint.config.js`，通过浏览器预演布局，最后打包为单个 HTML 文件：
+
+```bash
+node my_skills/blueprint-presentation/scripts/init-blueprint.mjs path/to/project
+node my_skills/blueprint-presentation/scripts/validate-blueprint.mjs path/to/project
+
+# Terminal 1: preview
+python3 -m http.server 4173 --directory path/to/project
+
+# Terminal 2: pack after review
+node my_skills/blueprint-presentation/scripts/pack-blueprint.mjs path/to/project
+```
+
+浏览器默认进入演示模式，仅允许点击节点、跳转场景和查看内容。预演模式用于演讲前校准：支持组件拖动、网格吸附、缩放、少量文本修改、撤销重做，以及保存 `blueprint-overrides.json`。组件数量、类型和关系仍然在本地配置中维护。
+
 ## 目录结构
 
 ```
@@ -28,6 +46,7 @@ SKILLS/
 │   ├── detailed-docx/              # Word 文档精细操作（含公式/分栏/三线表）
 │   ├── sci-group-read/             # 学术论文分析
 │   ├── html-presentation-skill/    # HTML 幻灯片生成
+│   ├── blueprint-presentation/     # 结构化蓝图大屏展示
 │   ├── document-format-skills-main/ # 文档格式处理
 │   ├── lightread-cli/              # LightRead 命令行集成
 │   ├── my-paper-polish-skills/     # 论文润色与 LaTeX 撰写
@@ -35,10 +54,16 @@ SKILLS/
 │   ├── skill-creator/              # Skill 开发与评测工具
 │   ├── ultimate-scientific-research/ # 全流程科研统帅引擎
 │   └── side/                       # 当前在研项目工作区
+├── LICENSE                         # 默认 Apache-2.0
+├── LICENSES.md                     # 混合许可证映射
 └── README.md
 ```
 
 ## 更新日志
+
+### 2026-06-01
+- **blueprint-presentation**：新增蓝图式 HTML 展示 skill。支持全局思维导图、节点概览、场景跳转、7 类自由组件、16×12 网格布局、演示/预演双模式、拖动缩放、少量文本修订、`localStorage` 草稿持久化、覆盖文件保存、配置校验和单 HTML 打包。
+- **blueprint-presentation**：采用 Blueprint Swiss 视觉系统，参考并注明 `op7418/guizang-ppt-skill` 来源；该 skill 单独使用 AGPL-3.0。
 
 ### 2026-05-12
 - **detailed-docx**：新增 `add_equation_with_number()`（公式 + 编号一键排版，底层用无边框 1×2 表格）、`add_equation_to_table_cell()`；公式引擎升级为 pandoc 优先三级降级链，返回值新增 `engine` 字段；补充《模板装配陷阱》一节，覆盖双栏宽度计算、多级列表命名样式、LaTeX raw string、PDF 图片转换等真实投稿踩坑。
@@ -51,4 +76,8 @@ SKILLS/
 
 ## License
 
-Apache-2.0
+仓库中的 skill 可能使用不同许可证。请以各 skill 目录内的许可证文件和来源说明为准。
+
+- 仓库默认内容：Apache-2.0，详见 [`LICENSE`](LICENSE)。
+- `blueprint-presentation`：AGPL-3.0，详见 [`LICENSE`](my_skills/blueprint-presentation/LICENSE) 和 [`references/upstream.md`](my_skills/blueprint-presentation/references/upstream.md)。
+- 完整授权映射：[`LICENSES.md`](LICENSES.md)。
