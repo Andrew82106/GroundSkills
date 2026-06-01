@@ -11,6 +11,7 @@
 - Components do not depend on internal scrollbars.
 - Projected body text remains readable.
 - Editable fields are limited to short rehearsal corrections.
+- The selected theme is a registered preset and fits the material.
 
 ## Presentation Mode
 
@@ -26,6 +27,7 @@
 - Dragging empty overview space pans the canvas after zooming.
 - Back returns one level through nested scene navigation.
 - Configured interface languages switch toolbar, preview, rail, and feedback labels.
+- Review demos cycle only through configured theme presets; final artifacts lock the intended theme unless comparison is deliberate.
 
 ## Rehearsal Mode
 

@@ -24,6 +24,7 @@
       zoomOut: '缩小',
       zoomIn: '放大',
       switchLanguage: '切换界面语言',
+      switchTheme: '切换视觉主题',
       directionalRelation: '方向关系',
       clickNode: '点击节点查看概览',
       presentationLocked: '演示模式 / 结构已锁定',
@@ -65,6 +66,7 @@
       zoomOut: 'Zoom out',
       zoomIn: 'Zoom in',
       switchLanguage: 'Switch interface language',
+      switchTheme: 'Switch visual theme',
       directionalRelation: 'Directional relation',
       clickNode: 'Click node for preview',
       presentationLocked: 'Presentation mode / structure locked',
@@ -103,8 +105,11 @@
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const storageKey = `${STORAGE_PREFIX}${baseConfig.title || 'untitled'}`;
   const languageKey = `${storageKey}:language`;
+  const themeKey = `${storageKey}:theme`;
   const availableLanguages = [...new Set(baseConfig.ui?.languages || [baseConfig.ui?.defaultLanguage || 'zh-CN', 'en'])];
   const defaultLanguage = baseConfig.ui?.defaultLanguage || availableLanguages[0] || 'zh-CN';
+  const defaultTheme = baseConfig.theme || 'swiss-ikb';
+  const availableThemes = [...new Set([defaultTheme, ...(baseConfig.ui?.themes || [])])];
   const overviewConfig = {
     type: 'mind-map',
     width: 1440,
@@ -120,6 +125,7 @@
     navigation: [],
     rehearsal: new URLSearchParams(location.search).get('mode') === 'rehearsal',
     language: defaultLanguage,
+    theme: defaultTheme,
     overviewTransform: { x: 0, y: 0, zoom: 1 },
     overviewFitted: false,
     overviewTouched: false,
@@ -175,6 +181,38 @@
     const index = availableLanguages.indexOf(state.language);
     const nextLanguage = availableLanguages[(index + 1) % availableLanguages.length];
     return baseConfig.ui?.languageLabels?.[nextLanguage] || nextLanguage;
+  }
+
+  function loadTheme() {
+    try {
+      const savedTheme = localStorage.getItem(themeKey);
+      if (savedTheme && availableThemes.includes(savedTheme)) state.theme = savedTheme;
+    } catch {
+      state.theme = defaultTheme;
+    }
+  }
+
+  function applyTheme() {
+    document.body.dataset.theme = state.theme;
+  }
+
+  function toggleTheme() {
+    if (availableThemes.length < 2) return;
+    const index = availableThemes.indexOf(state.theme);
+    state.theme = availableThemes[(index + 1) % availableThemes.length];
+    try {
+      localStorage.setItem(themeKey, state.theme);
+    } catch {
+      // A packed file still works when the browser disables local storage.
+    }
+    render();
+  }
+
+  function nextThemeLabel() {
+    if (availableThemes.length < 2) return '';
+    const index = availableThemes.indexOf(state.theme);
+    const nextTheme = availableThemes[(index + 1) % availableThemes.length];
+    return baseConfig.ui?.themeLabels?.[nextTheme] || nextTheme;
   }
 
   function mergeOverrides(...layers) {
@@ -315,6 +353,7 @@
             <button class="tool-button" data-action="save">${escapeHtml(t('save'))}</button>
           </div>
           <div class="toolbar-group">
+            ${availableThemes.length > 1 ? `<button class="tool-button" data-action="toggle-theme" aria-label="${escapeAttr(t('switchTheme'))}: ${escapeAttr(nextThemeLabel())}">${escapeHtml(nextThemeLabel())}</button>` : ''}
             ${availableLanguages.length > 1 ? `<button class="tool-button" data-action="toggle-language" aria-label="${escapeAttr(t('switchLanguage'))}">${escapeHtml(nextLanguageLabel())}</button>` : ''}
             <button class="tool-button ${state.rehearsal ? 'active' : ''}" data-action="toggle-mode">
               ${escapeHtml(state.rehearsal ? t('exitRehearsal') : t('rehearsal'))}
@@ -859,6 +898,7 @@
 
   function render() {
     document.body.classList.toggle('is-rehearsal', state.rehearsal);
+    applyTheme();
     app.innerHTML = `
       <div class="app-shell">
         ${toolbar()}
@@ -1003,6 +1043,8 @@
       goBack();
     } else if (action === 'toggle-language') {
       toggleLanguage();
+    } else if (action === 'toggle-theme') {
+      toggleTheme();
     } else if (action === 'toggle-mode') {
       toggleMode();
     } else if (action === 'zoom-in') {
@@ -1187,11 +1229,13 @@
     fitOverview,
     fitScene,
     toggleLanguage,
+    toggleTheme,
     toggleMode,
     saveChanges
   };
 
   loadLanguage();
+  loadTheme();
   loadInitialOverrides().then(() => {
     restoreLocationFromHash();
     render();

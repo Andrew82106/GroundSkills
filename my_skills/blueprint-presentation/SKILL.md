@@ -11,35 +11,36 @@ Build a Blueprint as a local-configured HTML presentation. Treat the global stru
 
 1. Read `references/workflow.md`.
 2. Read `references/visual-system.md` before changing visual styling.
-3. Read `references/component-contracts.md` before adding components or config fields.
-4. Initialize a project:
+3. Read `references/themes.md` and choose a registered visual preset.
+4. Read `references/component-contracts.md` before adding components or config fields.
+5. Initialize a project:
 
 ```bash
 node <SKILL_ROOT>/scripts/init-blueprint.mjs path/to/project
 ```
 
-5. Edit `blueprint.config.js`. Keep content and component count local. Do not add browser-side creation or deletion controls.
-6. Validate before preview:
+6. Edit `blueprint.config.js`. Keep content and component count local. Do not add browser-side creation or deletion controls.
+7. Validate before preview:
 
 ```bash
 node <SKILL_ROOT>/scripts/validate-blueprint.mjs path/to/project
 ```
 
-7. Preview the editable source during development with a local server:
+8. Preview the editable source during development with a local server:
 
 ```bash
 cd path/to/project
 python3 -m http.server 4173
 ```
 
-8. Open `http://localhost:4173`. Verify overview navigation, scene navigation, presentation mode, rehearsal mode, dragging, resizing, selected text editing, reload persistence, and the save button.
-9. Pack the final single-file artifact:
+9. Open `http://localhost:4173`. Verify overview navigation, scene navigation, presentation mode, rehearsal mode, dragging, resizing, selected text editing, reload persistence, and the save button.
+10. Pack the final single-file artifact:
 
 ```bash
 node <SKILL_ROOT>/scripts/pack-blueprint.mjs path/to/project
 ```
 
-10. Deliver `path/to/project/blueprint.html`. The viewer opens this file directly; no server command is required.
+11. Deliver `path/to/project/blueprint.html`. The viewer opens this file directly; no server command is required.
 
 ## Product Boundary
 
@@ -48,11 +49,11 @@ Keep two runtime modes:
 - **Presentation mode**: lock components. Allow overview exploration, node preview, scene navigation, zoom controls, and returning to the global blueprint.
 - **Rehearsal mode**: allow component dragging, grid-snapped resizing, and editing only text explicitly marked editable by registered components. Persist drafts to `localStorage`. Expose undo, redo, reset-scene, exit, and save actions.
 
-Do not implement browser-side node, scene, or component creation and deletion. Do not implement arbitrary HTML, CSS, script, theme, image-upload, or relationship editing.
+Do not implement browser-side node, scene, component, or theme creation and deletion. Do not implement arbitrary HTML, CSS, script, color, image-upload, or relationship editing.
 
 ## Design Rules
 
-Use `Blueprint Swiss` as the default and only first-party visual system. Preserve the upstream Swiss discipline: one saturated accent color, rectilinear geometry, fine rules, a visible structural grid, large light-weight headings, restrained motion, and mono metadata.
+Use a registered preset from `references/themes.md`. Keep `swiss-ikb` as the default. Choose the Swiss family for precise analytical material: one saturated accent color, rectilinear geometry, fine rules, a visible structural grid, large light-weight headings, restrained motion, and mono metadata. Choose the Editorial family when the material needs reading texture: serif display headings, paper-and-ink palettes, editorial rules, and quieter evidence surfaces.
 
 Choose `overview.type` from `mind-map`, `dag`, or `list` according to the content. Give the overview its own canvas dimensions. The initial view fits the canvas, while zooming may intentionally move content beyond the viewport; viewers can pan the canvas to inspect it.
 
@@ -71,6 +72,7 @@ Before writing config, define:
 5. The layout slot for each component.
 6. The short text fields that may be refined during rehearsal.
 7. The default interface language and optional language switcher choices.
+8. The registered visual-system preset.
 
 Keep the overview map concise. Use scenes for detail. Use components to support a node, not to recreate a conventional slide full of unrelated boxes.
 

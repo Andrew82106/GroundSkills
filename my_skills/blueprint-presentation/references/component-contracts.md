@@ -2,7 +2,13 @@
 
 ## Blueprint Options
 
-Choose the global structure form and canvas size according to the content:
+Choose a registered visual preset and the global structure form according to the content:
+
+```js
+theme: "swiss-ikb"
+```
+
+Read `themes.md` for the Swiss and Editorial preset registry. The runtime defaults to `swiss-ikb`.
 
 ```js
 overview: {
@@ -25,6 +31,17 @@ ui: {
 ```
 
 The built-in interface dictionary covers `zh-CN` and `en`. Add `ui.labels[language]` only when overriding built-in labels or introducing another interface language. Presentation content remains authored text; the runtime does not translate it.
+
+For a review demo, expose a controlled theme switcher:
+
+```js
+ui: {
+  themes: ["swiss-ikb", "editorial-ink"],
+  themeLabels: { "swiss-ikb": "IKB", "editorial-ink": "INK" }
+}
+```
+
+Omit `ui.themes` in a final Blueprint when the chosen visual system should remain locked.
 
 ## Scene Canvases
 

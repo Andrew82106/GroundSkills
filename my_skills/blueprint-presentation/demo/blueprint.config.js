@@ -2,6 +2,7 @@ window.BLUEPRINT_CONFIG = {
   title: 'Blueprint Skill Manual',
   subtitle: '一份用蓝图解释蓝图的结构化说明书',
   meta: 'BLUEPRINT PRESENTATION / SELF-DOCUMENTING DEMO',
+  theme: 'swiss-ikb',
   overview: {
     type: 'dag',
     width: 1440,
@@ -10,7 +11,29 @@ window.BLUEPRINT_CONFIG = {
   ui: {
     defaultLanguage: 'zh-CN',
     languages: ['zh-CN', 'en'],
-    languageLabels: { 'zh-CN': '中文', en: 'EN' }
+    languageLabels: { 'zh-CN': '中文', en: 'EN' },
+    themes: [
+      'swiss-ikb',
+      'swiss-lemon',
+      'swiss-green',
+      'swiss-orange',
+      'editorial-ink',
+      'editorial-indigo',
+      'editorial-forest',
+      'editorial-kraft',
+      'editorial-dune'
+    ],
+    themeLabels: {
+      'swiss-ikb': 'IKB',
+      'swiss-lemon': 'LEMON',
+      'swiss-green': 'GREEN',
+      'swiss-orange': 'ORANGE',
+      'editorial-ink': 'INK',
+      'editorial-indigo': 'INDIGO',
+      'editorial-forest': 'FOREST',
+      'editorial-kraft': 'KRAFT',
+      'editorial-dune': 'DUNE'
+    }
   },
   nodes: [
     {
@@ -49,6 +72,14 @@ window.BLUEPRINT_CONFIG = {
       tone: 'accent'
     },
     {
+      id: 'themes',
+      title: '视觉系统',
+      summary: 'Swiss 负责分析与方法论，Editorial 负责叙事与观点。色板是受控预设，不是浏览器里的任意编辑。',
+      scene: 'themes-scene',
+      x: 53,
+      y: 76
+    },
+    {
       id: 'persistence',
       title: '保存覆盖层',
       summary: '本地配置仍然是主源。浏览器调整保存为小型覆盖文件，便于审阅和回填。',
@@ -70,7 +101,9 @@ window.BLUEPRINT_CONFIG = {
     { from: 'entry', to: 'structure', label: '先展开全貌' },
     { from: 'structure', to: 'components', label: '再进入细节' },
     { from: 'components', to: 'modes', label: '预演校准' },
+    { from: 'components', to: 'themes', label: '选择气质' },
     { from: 'modes', to: 'persistence', label: '保存调整' },
+    { from: 'themes', to: 'persistence', label: '锁定主题' },
     { from: 'persistence', to: 'delivery', label: '冻结交付' },
     { from: 'structure', to: 'delivery', label: '结构始终可见' }
   ],
@@ -217,9 +250,47 @@ window.BLUEPRINT_CONFIG = {
       ]
     },
     {
+      id: 'themes-scene',
+      node: 'themes',
+      eyebrow: 'SCENE 04 / VISUAL SYSTEMS',
+      title: '主题不是换色，而是选择一种表达纪律。',
+      summary: '蓝图保留参考仓库的两条成熟方向：Swiss 强调结构精度，Editorial 强调叙事质感。右上角主题按钮用于在这份 demo 中轮换查看预设。',
+      components: [
+        {
+          id: 'themes-principle',
+          type: 'text',
+          eyebrow: 'CONTROLLED PRESETS',
+          title: '视觉系统先于色板。',
+          body: '正式蓝图通常在生成时锁定一个主题。demo 才开放主题轮换，用来判断内容更适合精确的结构分析，还是更接近电子杂志的叙事展开。',
+          bullets: ['Swiss：无衬线、直角、可见网格、单一高饱和锚点色', 'Editorial：衬线标题、纸张色、墨水色、编辑式分隔线', '浏览器只切换注册预设，不开放任意 CSS 修改'],
+          slot: { x: 1, y: 1, w: 7, h: 7 }
+        },
+        {
+          id: 'themes-table',
+          type: 'table',
+          eyebrow: 'REGISTERED THEMES',
+          title: '两族九套预设',
+          columns: ['系统', '预设', '适合内容'],
+          rows: [
+            ['Swiss', 'IKB / Lemon / Green / Orange', '产品、技术、分析、方法论'],
+            ['Editorial', 'Ink / Indigo / Forest', '叙事、观点、人文、研究背景'],
+            ['Editorial', 'Kraft / Dune', '历史、材料、田野、档案感内容']
+          ],
+          slot: { x: 9, y: 1, w: 8, h: 7 }
+        },
+        {
+          id: 'themes-quote',
+          type: 'quote',
+          quote: '色板是约束，不是装饰。',
+          cite: 'VISUAL RULE / 03',
+          slot: { x: 4, y: 9, w: 10, h: 3 }
+        }
+      ]
+    },
+    {
       id: 'modes-scene',
       node: 'modes',
-      eyebrow: 'SCENE 04 / TWO MODES',
+      eyebrow: 'SCENE 05 / TWO MODES',
       title: '展示和校准，必须分开。',
       summary: '蓝图在浏览器里提供两种模式，但不会演化成一个在线制作工具。',
       components: [
@@ -259,7 +330,7 @@ window.BLUEPRINT_CONFIG = {
     {
       id: 'persistence-scene',
       node: 'persistence',
-      eyebrow: 'SCENE 05 / SAVE MODEL',
+      eyebrow: 'SCENE 06 / SAVE MODEL',
       title: '保存的是覆盖层，不是混乱。',
       summary: '浏览器调整与本地源配置解耦。每次保存仍然是一个可以阅读、审阅和回填的小文件。',
       components: [
@@ -303,7 +374,7 @@ window.BLUEPRINT_CONFIG = {
     {
       id: 'delivery-scene',
       node: 'delivery',
-      eyebrow: 'SCENE 06 / DELIVERY',
+      eyebrow: 'SCENE 07 / DELIVERY',
       title: '制作目录继续迭代，单个 HTML 对外交付。',
       summary: '源项目保留全部配置和素材。打包器将 CSS、运行时、覆盖配置和本地图片内联为一个文件。',
       components: [

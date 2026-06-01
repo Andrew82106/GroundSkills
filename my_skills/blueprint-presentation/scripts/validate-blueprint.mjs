@@ -6,6 +6,17 @@ import { loadBlueprintConfig } from './load-config.mjs';
 const projectDir = resolve(process.argv[2] || '.');
 const registeredTypes = new Set(['text', 'stats', 'table', 'diagram', 'structure', 'quote', 'links', 'image']);
 const registeredOverviewTypes = new Set(['mind-map', 'dag', 'list']);
+const registeredThemes = new Set([
+  'swiss-ikb',
+  'swiss-lemon',
+  'swiss-green',
+  'swiss-orange',
+  'editorial-ink',
+  'editorial-indigo',
+  'editorial-forest',
+  'editorial-kraft',
+  'editorial-dune'
+]);
 const errors = [];
 const warnings = [];
 
@@ -49,6 +60,9 @@ async function main() {
   }
 
   requireString(config.title, 'title');
+  if (config.theme !== undefined && !registeredThemes.has(config.theme)) {
+    err(`theme "${config.theme}" is not registered.`);
+  }
   if (config.overview !== undefined) {
     if (!isObject(config.overview)) {
       err('overview must be an object.');
@@ -75,6 +89,14 @@ async function main() {
         for (const [index, language] of config.ui.languages.entries()) requireString(language, `ui.languages[${index}]`);
         if (config.ui.defaultLanguage && !config.ui.languages.includes(config.ui.defaultLanguage)) {
           err('ui.defaultLanguage must appear in ui.languages.');
+        }
+      }
+      if (config.ui.themes !== undefined && (!Array.isArray(config.ui.themes) || !config.ui.themes.length)) {
+        err('ui.themes must contain at least one registered theme.');
+      }
+      if (Array.isArray(config.ui.themes)) {
+        for (const [index, theme] of config.ui.themes.entries()) {
+          if (!registeredThemes.has(theme)) err(`ui.themes[${index}] "${theme}" is not registered.`);
         }
       }
     }

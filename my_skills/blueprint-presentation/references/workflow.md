@@ -20,7 +20,13 @@ Set `overview.width` and `overview.height` for a comfortable normal-scale canvas
 
 Assign scenes only to nodes that need expansion. A useful Blueprint can have 8-14 overview nodes and 3-6 scenes. Avoid turning every node into a scene.
 
-## 2. Choose Components
+## 2. Choose A Visual System
+
+Read `themes.md`. Choose `Swiss` for precise product, technical, analytical, and methods-oriented material. Choose `Editorial` for narrative, humanities, historical, background, and research-story material. Then set one registered `theme` ID in `blueprint.config.js`.
+
+Expose `ui.themes` only when reviewers need to compare approved presets. A final Blueprint should usually lock one preset.
+
+## 3. Choose Components
 
 Use the smallest set of components that explains the node:
 
@@ -35,7 +41,7 @@ Use the smallest set of components that explains the node:
 
 Read `component-contracts.md` for config shapes.
 
-## 3. Place Components
+## 4. Place Components
 
 Place components on the 16-column by 12-row grid. Use `slot: { x, y, w, h }`, with one-based `x` and `y`.
 
@@ -51,7 +57,7 @@ Use composition, not uniform card grids:
 
 Rehearsal mode exists for small corrections. If every component needs dragging, improve the config layout instead.
 
-## 4. Preview And Save During Authoring
+## 5. Preview And Save During Authoring
 
 While authoring, serve the editable project over HTTP so optional `blueprint-overrides.json` can load:
 
@@ -73,7 +79,7 @@ In rehearsal mode:
 
 Review saved overrides before placing them beside the HTML source. The overrides remain intentionally small and reviewable.
 
-## 5. Validate And Pack
+## 6. Validate And Pack
 
 Validate the source project:
 

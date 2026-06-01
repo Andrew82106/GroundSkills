@@ -1,30 +1,46 @@
-# Blueprint Swiss Visual System
+# Blueprint Visual Systems
 
-Blueprint Swiss adapts the information discipline of Swiss international style to a structural presentation canvas. The design should feel like a precise working blueprint rather than a conventional slide deck.
+Blueprint adapts two upstream directions to a structural presentation canvas. `Swiss` should feel like a precise working blueprint. `Editorial` should feel like an explorable electronic magazine. Both remain structured large-screen systems rather than conventional slide decks.
 
-## Direction
+Read `themes.md` before choosing a preset.
 
-Use:
+## Shared Direction
 
-- A warm paper background: `#fafaf8`
-- Near-black text: `#0a0a0a`
-- One saturated accent: IKB blue `#002fa7`
 - Straight edges, no decorative rounding
-- Hairline borders and visible structural coordinates
-- Large, light-weight headings and compact mono metadata
+- Visible structural coordinates and explicit hierarchy
+- Compact mono metadata
 - Sparse, purposeful motion
 
 Avoid:
 
-- Gradients, glassmorphism, soft shadows, floating rounded cards
-- Multiple competing accent colors
+- Glassmorphism, soft shadows, and floating rounded cards
 - Generic dashboard density
 - Decorative icons without explanatory value
 - Components scattered without a visible hierarchy
 
+## Swiss Direction
+
+Use Swiss for product, technical, analytical, and methods-oriented material:
+
+- A light neutral paper background
+- Near-black text
+- One saturated accent such as IKB blue, lemon, acid green, or signal orange
+- Hairline borders and a visible structural grid
+- Large, light-weight sans headings
+
+## Editorial Direction
+
+Use Editorial for narrative, humanities, historical, background, and research-story material:
+
+- Warm paper and ink palettes
+- Serif display headings with sans body copy
+- Editorial rules instead of uniform card borders
+- Quiet evidence surfaces and restrained monochrome emphasis
+- An archival, electronic-magazine reading texture
+
 ## Typography
 
-Use a neutral sans stack for text and a mono stack for coordinates and metadata. Preserve the hierarchy:
+Use a neutral sans stack for Swiss text, a serif display stack for Editorial headings, and a mono stack for coordinates and metadata. Preserve the hierarchy:
 
 | Role | Guidance |
 |---|---|

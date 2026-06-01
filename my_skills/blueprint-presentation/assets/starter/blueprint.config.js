@@ -2,6 +2,7 @@ window.BLUEPRINT_CONFIG = {
   title: '蓝图 Blueprint',
   subtitle: '基于自由组件的结构化大屏展示方案',
   meta: 'STRUCTURED PRESENTATION / DEMO',
+  theme: 'swiss-ikb',
   overview: {
     type: 'mind-map',
     width: 1440,

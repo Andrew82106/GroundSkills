@@ -8,13 +8,15 @@
   <style data-blueprint-style>
 /*
  * Blueprint Presentation - AGPL-3.0
- * Adapts Swiss visual-system ideas from https://github.com/op7418/guizang-ppt-skill
+ * Adapts Swiss and electronic-magazine visual-system ideas from https://github.com/op7418/guizang-ppt-skill
  */
 :root {
   --paper: #fafaf8;
   --paper-rgb: 250, 250, 248;
+  --paper-tint: #f0f0ee;
   --ink: #0a0a0a;
   --ink-rgb: 10, 10, 10;
+  --ink-tint: #18181a;
   --grey-1: #f0f0ee;
   --grey-2: #d4d4d2;
   --grey-3: #737373;
@@ -23,9 +25,116 @@
   --accent-on: #ffffff;
   --border: rgba(10, 10, 10, .16);
   --sans: "Helvetica Neue", "Arial Narrow", "PingFang SC", "Noto Sans SC", sans-serif;
+  --serif: "Iowan Old Style", "Baskerville", "Songti SC", "STSong", Georgia, serif;
   --mono: "IBM Plex Mono", "SFMono-Regular", "Cascadia Code", "Consolas", monospace;
   --ease: cubic-bezier(.2, 0, .38, .9);
   --grid-line: rgba(0, 47, 167, .095);
+}
+
+body[data-theme="swiss-lemon"] {
+  --accent: #ffd500;
+  --accent-rgb: 255, 213, 0;
+  --accent-on: #0a0a0a;
+  --grid-line: rgba(255, 213, 0, .14);
+}
+
+body[data-theme="swiss-green"] {
+  --accent: #c5e803;
+  --accent-rgb: 197, 232, 3;
+  --accent-on: #0a0a0a;
+  --grid-line: rgba(197, 232, 3, .14);
+}
+
+body[data-theme="swiss-orange"] {
+  --accent: #ff6b35;
+  --accent-rgb: 255, 107, 53;
+  --accent-on: #ffffff;
+  --grid-line: rgba(255, 107, 53, .12);
+}
+
+body[data-theme="editorial-ink"] {
+  --paper: #f1efea;
+  --paper-rgb: 241, 239, 234;
+  --paper-tint: #e8e5de;
+  --ink: #0a0a0b;
+  --ink-rgb: 10, 10, 11;
+  --ink-tint: #18181a;
+  --grey-1: #e8e5de;
+  --grey-2: #ccc8c0;
+  --grey-3: #68645e;
+  --accent: #0a0a0b;
+  --accent-rgb: 10, 10, 11;
+  --accent-on: #f1efea;
+  --border: rgba(10, 10, 11, .22);
+  --grid-line: rgba(10, 10, 11, .075);
+}
+
+body[data-theme="editorial-indigo"] {
+  --paper: #f1f3f5;
+  --paper-rgb: 241, 243, 245;
+  --paper-tint: #e4e8ec;
+  --ink: #0a1f3d;
+  --ink-rgb: 10, 31, 61;
+  --ink-tint: #152a4a;
+  --grey-1: #e4e8ec;
+  --grey-2: #c5cdd6;
+  --grey-3: #68798c;
+  --accent: #0a1f3d;
+  --accent-rgb: 10, 31, 61;
+  --accent-on: #f1f3f5;
+  --border: rgba(10, 31, 61, .22);
+  --grid-line: rgba(10, 31, 61, .075);
+}
+
+body[data-theme="editorial-forest"] {
+  --paper: #f5f1e8;
+  --paper-rgb: 245, 241, 232;
+  --paper-tint: #ece7da;
+  --ink: #1a2e1f;
+  --ink-rgb: 26, 46, 31;
+  --ink-tint: #253d2c;
+  --grey-1: #ece7da;
+  --grey-2: #d4cdbc;
+  --grey-3: #737969;
+  --accent: #1a2e1f;
+  --accent-rgb: 26, 46, 31;
+  --accent-on: #f5f1e8;
+  --border: rgba(26, 46, 31, .22);
+  --grid-line: rgba(26, 46, 31, .075);
+}
+
+body[data-theme="editorial-kraft"] {
+  --paper: #eedfc7;
+  --paper-rgb: 238, 223, 199;
+  --paper-tint: #e0d0b6;
+  --ink: #2a1e13;
+  --ink-rgb: 42, 30, 19;
+  --ink-tint: #3a2a1d;
+  --grey-1: #e0d0b6;
+  --grey-2: #c8b392;
+  --grey-3: #786854;
+  --accent: #2a1e13;
+  --accent-rgb: 42, 30, 19;
+  --accent-on: #eedfc7;
+  --border: rgba(42, 30, 19, .22);
+  --grid-line: rgba(42, 30, 19, .075);
+}
+
+body[data-theme="editorial-dune"] {
+  --paper: #f0e6d2;
+  --paper-rgb: 240, 230, 210;
+  --paper-tint: #e3d7bf;
+  --ink: #1f1a14;
+  --ink-rgb: 31, 26, 20;
+  --ink-tint: #2d2620;
+  --grey-1: #e3d7bf;
+  --grey-2: #cdbd9e;
+  --grey-3: #756a58;
+  --accent: #1f1a14;
+  --accent-rgb: 31, 26, 20;
+  --accent-on: #f0e6d2;
+  --border: rgba(31, 26, 20, .22);
+  --grid-line: rgba(31, 26, 20, .075);
 }
 
 * { box-sizing: border-box; }
@@ -63,8 +172,8 @@ button:focus-visible, [contenteditable="true"]:focus-visible {
   overflow: hidden;
   background:
     linear-gradient(rgba(var(--paper-rgb), .92), rgba(var(--paper-rgb), .92)),
-    repeating-linear-gradient(0deg, transparent 0 31px, rgba(10, 10, 10, .035) 31px 32px),
-    repeating-linear-gradient(90deg, transparent 0 31px, rgba(10, 10, 10, .035) 31px 32px);
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(var(--ink-rgb), .035) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, rgba(var(--ink-rgb), .035) 31px 32px);
 }
 
 .topbar {
@@ -995,7 +1104,125 @@ body.is-rehearsal [data-edit-key]:hover {
   transform: translateY(0);
 }
 
+body[data-theme^="editorial-"] .topbar {
+  border-bottom: 2px solid var(--ink);
+  backdrop-filter: none;
+}
+
+body[data-theme^="editorial-"] .brand {
+  border-right: 2px solid var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: .035em;
+  text-transform: none;
+}
+
+body[data-theme^="editorial-"] .brand-mark {
+  width: 17px;
+  height: 3px;
+  background: var(--ink);
+}
+
+body[data-theme^="editorial-"] .overview-copy {
+  border-right: 2px solid var(--ink);
+  background: rgba(var(--paper-rgb), .88);
+}
+
+body[data-theme^="editorial-"] .overview-title,
+body[data-theme^="editorial-"] .scene-title,
+body[data-theme^="editorial-"] .drawer-title,
+body[data-theme^="editorial-"] .rail-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  letter-spacing: -.055em;
+}
+
+body[data-theme^="editorial-"] .overview-title em {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+body[data-theme^="editorial-"] .blueprint-node,
+body[data-theme^="editorial-"] .structure-node {
+  border: 0;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--border);
+}
+
+body[data-theme^="editorial-"] .node-title,
+body[data-theme^="editorial-"] .structure-node-title,
+body[data-theme^="editorial-"] .component-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  letter-spacing: -.035em;
+}
+
+body[data-theme^="editorial-"] .scene-rail {
+  background: var(--paper-tint);
+}
+
+body[data-theme^="editorial-"] .component {
+  border: 0;
+  border-top: 2px solid var(--ink);
+  background: rgba(var(--paper-rgb), .92);
+}
+
+body[data-theme^="editorial-"] .component:hover {
+  border-top-color: var(--accent);
+}
+
+body[data-theme^="editorial-"] .diagram-node {
+  border: 0;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--border);
+  background: rgba(var(--paper-rgb), .72);
+  font-family: var(--serif);
+  font-weight: 700;
+}
+
+body[data-theme^="editorial-"] .table-card th {
+  border-bottom: 2px solid var(--ink);
+  color: var(--ink);
+}
+
+body[data-theme^="editorial-"] .stat-value {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-weight: 700;
+}
+
+body[data-theme^="editorial-"] .quote-block {
+  background: var(--ink-tint);
+}
+
+body[data-theme^="editorial-"] .quote-mark {
+  color: var(--paper-tint);
+  font-family: var(--serif);
+}
+
+body[data-theme^="editorial-"] .quote-copy {
+  font-family: var(--serif);
+  font-weight: 600;
+}
+
+body[data-theme^="editorial-"] .preview-drawer {
+  border-top: 2px solid var(--ink);
+  border-left: 0;
+}
+
 @media (max-width: 900px) {
+  .topbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+
+  .topbar::-webkit-scrollbar {
+    display: none;
+  }
+
   .brand {
     min-width: auto;
   }
@@ -1054,6 +1281,7 @@ window.BLUEPRINT_CONFIG = {
   title: 'Blueprint Skill Manual',
   subtitle: '一份用蓝图解释蓝图的结构化说明书',
   meta: 'BLUEPRINT PRESENTATION / SELF-DOCUMENTING DEMO',
+  theme: 'swiss-ikb',
   overview: {
     type: 'dag',
     width: 1440,
@@ -1062,7 +1290,29 @@ window.BLUEPRINT_CONFIG = {
   ui: {
     defaultLanguage: 'zh-CN',
     languages: ['zh-CN', 'en'],
-    languageLabels: { 'zh-CN': '中文', en: 'EN' }
+    languageLabels: { 'zh-CN': '中文', en: 'EN' },
+    themes: [
+      'swiss-ikb',
+      'swiss-lemon',
+      'swiss-green',
+      'swiss-orange',
+      'editorial-ink',
+      'editorial-indigo',
+      'editorial-forest',
+      'editorial-kraft',
+      'editorial-dune'
+    ],
+    themeLabels: {
+      'swiss-ikb': 'IKB',
+      'swiss-lemon': 'LEMON',
+      'swiss-green': 'GREEN',
+      'swiss-orange': 'ORANGE',
+      'editorial-ink': 'INK',
+      'editorial-indigo': 'INDIGO',
+      'editorial-forest': 'FOREST',
+      'editorial-kraft': 'KRAFT',
+      'editorial-dune': 'DUNE'
+    }
   },
   nodes: [
     {
@@ -1101,6 +1351,14 @@ window.BLUEPRINT_CONFIG = {
       tone: 'accent'
     },
     {
+      id: 'themes',
+      title: '视觉系统',
+      summary: 'Swiss 负责分析与方法论，Editorial 负责叙事与观点。色板是受控预设，不是浏览器里的任意编辑。',
+      scene: 'themes-scene',
+      x: 53,
+      y: 76
+    },
+    {
       id: 'persistence',
       title: '保存覆盖层',
       summary: '本地配置仍然是主源。浏览器调整保存为小型覆盖文件，便于审阅和回填。',
@@ -1122,7 +1380,9 @@ window.BLUEPRINT_CONFIG = {
     { from: 'entry', to: 'structure', label: '先展开全貌' },
     { from: 'structure', to: 'components', label: '再进入细节' },
     { from: 'components', to: 'modes', label: '预演校准' },
+    { from: 'components', to: 'themes', label: '选择气质' },
     { from: 'modes', to: 'persistence', label: '保存调整' },
+    { from: 'themes', to: 'persistence', label: '锁定主题' },
     { from: 'persistence', to: 'delivery', label: '冻结交付' },
     { from: 'structure', to: 'delivery', label: '结构始终可见' }
   ],
@@ -1269,9 +1529,47 @@ window.BLUEPRINT_CONFIG = {
       ]
     },
     {
+      id: 'themes-scene',
+      node: 'themes',
+      eyebrow: 'SCENE 04 / VISUAL SYSTEMS',
+      title: '主题不是换色，而是选择一种表达纪律。',
+      summary: '蓝图保留参考仓库的两条成熟方向：Swiss 强调结构精度，Editorial 强调叙事质感。右上角主题按钮用于在这份 demo 中轮换查看预设。',
+      components: [
+        {
+          id: 'themes-principle',
+          type: 'text',
+          eyebrow: 'CONTROLLED PRESETS',
+          title: '视觉系统先于色板。',
+          body: '正式蓝图通常在生成时锁定一个主题。demo 才开放主题轮换，用来判断内容更适合精确的结构分析，还是更接近电子杂志的叙事展开。',
+          bullets: ['Swiss：无衬线、直角、可见网格、单一高饱和锚点色', 'Editorial：衬线标题、纸张色、墨水色、编辑式分隔线', '浏览器只切换注册预设，不开放任意 CSS 修改'],
+          slot: { x: 1, y: 1, w: 7, h: 7 }
+        },
+        {
+          id: 'themes-table',
+          type: 'table',
+          eyebrow: 'REGISTERED THEMES',
+          title: '两族九套预设',
+          columns: ['系统', '预设', '适合内容'],
+          rows: [
+            ['Swiss', 'IKB / Lemon / Green / Orange', '产品、技术、分析、方法论'],
+            ['Editorial', 'Ink / Indigo / Forest', '叙事、观点、人文、研究背景'],
+            ['Editorial', 'Kraft / Dune', '历史、材料、田野、档案感内容']
+          ],
+          slot: { x: 9, y: 1, w: 8, h: 7 }
+        },
+        {
+          id: 'themes-quote',
+          type: 'quote',
+          quote: '色板是约束，不是装饰。',
+          cite: 'VISUAL RULE / 03',
+          slot: { x: 4, y: 9, w: 10, h: 3 }
+        }
+      ]
+    },
+    {
       id: 'modes-scene',
       node: 'modes',
-      eyebrow: 'SCENE 04 / TWO MODES',
+      eyebrow: 'SCENE 05 / TWO MODES',
       title: '展示和校准，必须分开。',
       summary: '蓝图在浏览器里提供两种模式，但不会演化成一个在线制作工具。',
       components: [
@@ -1311,7 +1609,7 @@ window.BLUEPRINT_CONFIG = {
     {
       id: 'persistence-scene',
       node: 'persistence',
-      eyebrow: 'SCENE 05 / SAVE MODEL',
+      eyebrow: 'SCENE 06 / SAVE MODEL',
       title: '保存的是覆盖层，不是混乱。',
       summary: '浏览器调整与本地源配置解耦。每次保存仍然是一个可以阅读、审阅和回填的小文件。',
       components: [
@@ -1355,7 +1653,7 @@ window.BLUEPRINT_CONFIG = {
     {
       id: 'delivery-scene',
       node: 'delivery',
-      eyebrow: 'SCENE 06 / DELIVERY',
+      eyebrow: 'SCENE 07 / DELIVERY',
       title: '制作目录继续迭代，单个 HTML 对外交付。',
       summary: '源项目保留全部配置和素材。打包器将 CSS、运行时、覆盖配置和本地图片内联为一个文件。',
       components: [
@@ -1433,6 +1731,7 @@ window.BLUEPRINT_OVERRIDES = {}
       zoomOut: '缩小',
       zoomIn: '放大',
       switchLanguage: '切换界面语言',
+      switchTheme: '切换视觉主题',
       directionalRelation: '方向关系',
       clickNode: '点击节点查看概览',
       presentationLocked: '演示模式 / 结构已锁定',
@@ -1474,6 +1773,7 @@ window.BLUEPRINT_OVERRIDES = {}
       zoomOut: 'Zoom out',
       zoomIn: 'Zoom in',
       switchLanguage: 'Switch interface language',
+      switchTheme: 'Switch visual theme',
       directionalRelation: 'Directional relation',
       clickNode: 'Click node for preview',
       presentationLocked: 'Presentation mode / structure locked',
@@ -1512,8 +1812,11 @@ window.BLUEPRINT_OVERRIDES = {}
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const storageKey = `${STORAGE_PREFIX}${baseConfig.title || 'untitled'}`;
   const languageKey = `${storageKey}:language`;
+  const themeKey = `${storageKey}:theme`;
   const availableLanguages = [...new Set(baseConfig.ui?.languages || [baseConfig.ui?.defaultLanguage || 'zh-CN', 'en'])];
   const defaultLanguage = baseConfig.ui?.defaultLanguage || availableLanguages[0] || 'zh-CN';
+  const defaultTheme = baseConfig.theme || 'swiss-ikb';
+  const availableThemes = [...new Set([defaultTheme, ...(baseConfig.ui?.themes || [])])];
   const overviewConfig = {
     type: 'mind-map',
     width: 1440,
@@ -1529,6 +1832,7 @@ window.BLUEPRINT_OVERRIDES = {}
     navigation: [],
     rehearsal: new URLSearchParams(location.search).get('mode') === 'rehearsal',
     language: defaultLanguage,
+    theme: defaultTheme,
     overviewTransform: { x: 0, y: 0, zoom: 1 },
     overviewFitted: false,
     overviewTouched: false,
@@ -1584,6 +1888,38 @@ window.BLUEPRINT_OVERRIDES = {}
     const index = availableLanguages.indexOf(state.language);
     const nextLanguage = availableLanguages[(index + 1) % availableLanguages.length];
     return baseConfig.ui?.languageLabels?.[nextLanguage] || nextLanguage;
+  }
+
+  function loadTheme() {
+    try {
+      const savedTheme = localStorage.getItem(themeKey);
+      if (savedTheme && availableThemes.includes(savedTheme)) state.theme = savedTheme;
+    } catch {
+      state.theme = defaultTheme;
+    }
+  }
+
+  function applyTheme() {
+    document.body.dataset.theme = state.theme;
+  }
+
+  function toggleTheme() {
+    if (availableThemes.length < 2) return;
+    const index = availableThemes.indexOf(state.theme);
+    state.theme = availableThemes[(index + 1) % availableThemes.length];
+    try {
+      localStorage.setItem(themeKey, state.theme);
+    } catch {
+      // A packed file still works when the browser disables local storage.
+    }
+    render();
+  }
+
+  function nextThemeLabel() {
+    if (availableThemes.length < 2) return '';
+    const index = availableThemes.indexOf(state.theme);
+    const nextTheme = availableThemes[(index + 1) % availableThemes.length];
+    return baseConfig.ui?.themeLabels?.[nextTheme] || nextTheme;
   }
 
   function mergeOverrides(...layers) {
@@ -1724,6 +2060,7 @@ window.BLUEPRINT_OVERRIDES = {}
             <button class="tool-button" data-action="save">${escapeHtml(t('save'))}</button>
           </div>
           <div class="toolbar-group">
+            ${availableThemes.length > 1 ? `<button class="tool-button" data-action="toggle-theme" aria-label="${escapeAttr(t('switchTheme'))}: ${escapeAttr(nextThemeLabel())}">${escapeHtml(nextThemeLabel())}</button>` : ''}
             ${availableLanguages.length > 1 ? `<button class="tool-button" data-action="toggle-language" aria-label="${escapeAttr(t('switchLanguage'))}">${escapeHtml(nextLanguageLabel())}</button>` : ''}
             <button class="tool-button ${state.rehearsal ? 'active' : ''}" data-action="toggle-mode">
               ${escapeHtml(state.rehearsal ? t('exitRehearsal') : t('rehearsal'))}
@@ -2268,6 +2605,7 @@ window.BLUEPRINT_OVERRIDES = {}
 
   function render() {
     document.body.classList.toggle('is-rehearsal', state.rehearsal);
+    applyTheme();
     app.innerHTML = `
       <div class="app-shell">
         ${toolbar()}
@@ -2412,6 +2750,8 @@ window.BLUEPRINT_OVERRIDES = {}
       goBack();
     } else if (action === 'toggle-language') {
       toggleLanguage();
+    } else if (action === 'toggle-theme') {
+      toggleTheme();
     } else if (action === 'toggle-mode') {
       toggleMode();
     } else if (action === 'zoom-in') {
@@ -2596,11 +2936,13 @@ window.BLUEPRINT_OVERRIDES = {}
     fitOverview,
     fitScene,
     toggleLanguage,
+    toggleTheme,
     toggleMode,
     saveChanges
   };
 
   loadLanguage();
+  loadTheme();
   loadInitialOverrides().then(() => {
     restoreLocationFromHash();
     render();
