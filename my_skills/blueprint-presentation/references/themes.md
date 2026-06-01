@@ -26,21 +26,14 @@ Use `Editorial` for narrative arguments, humanities, background sections, histor
 
 Lock the generated Blueprint to one preset:
 
-```js
-theme: "swiss-ikb"
+```json
+"theme": "swiss-ikb"
 ```
 
 Expose a controlled switcher only when reviewers need to compare approved presets:
 
-```js
-ui: {
-  themes: ["swiss-ikb", "editorial-ink", "editorial-indigo"],
-  themeLabels: {
-    "swiss-ikb": "IKB",
-    "editorial-ink": "INK",
-    "editorial-indigo": "INDIGO"
-  }
-}
+```json
+"reviewThemes": ["swiss-ikb", "editorial-ink", "editorial-indigo"]
 ```
 
-The runtime persists the selected preset separately from rehearsal overrides. It does not support arbitrary colors, arbitrary CSS, or browser-side theme creation.
+The compiler supplies short toolbar labels. The runtime persists the selected preset separately from rehearsal overrides. It does not support arbitrary colors, arbitrary CSS, or browser-side theme creation.

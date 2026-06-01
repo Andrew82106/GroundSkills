@@ -1361,7 +1361,7 @@ window.BLUEPRINT_CONFIG = {
     {
       id: 'persistence',
       title: '保存覆盖层',
-      summary: '本地配置仍然是主源。浏览器调整保存为小型覆盖文件，便于审阅和回填。',
+      summary: '本地声明文件仍然是主源。浏览器调整保存为小型覆盖文件，便于审阅和回填。',
       scene: 'persistence-scene',
       x: 73,
       y: 72
@@ -1475,7 +1475,7 @@ window.BLUEPRINT_CONFIG = {
       node: 'components',
       eyebrow: 'SCENE 03 / COMPONENTIZATION',
       title: '组件是细节，不是页面。',
-      summary: '每个组件只负责一种表达任务。它们由本地配置决定，并吸附到统一的大屏网格。',
+      summary: '每个组件只负责一种表达任务。它们由本地声明决定，并吸附到统一的大屏网格。',
       components: [
         {
           id: 'component-stats',
@@ -1593,7 +1593,7 @@ window.BLUEPRINT_CONFIG = {
           type: 'text',
           eyebrow: 'BOUNDARY',
           title: '预演模式只负责最后一公里。',
-          body: '组件数量、类型、关系、素材和主题仍然在本地配置中维护。浏览器只承担布局校准和短文本修订。',
+          body: '组件数量、类型、关系、素材和主题都在 blueprint.source.json 中声明。浏览器只承担布局校准和短文本修订。',
           bullets: ['场景返回遵循进入路径', '拖动和缩放自动吸附网格', '界面按钮可以切换语言', '保存结果可以审阅'],
           slot: { x: 11, y: 1, w: 6, h: 7 }
         },
@@ -1611,7 +1611,7 @@ window.BLUEPRINT_CONFIG = {
       node: 'persistence',
       eyebrow: 'SCENE 06 / SAVE MODEL',
       title: '保存的是覆盖层，不是混乱。',
-      summary: '浏览器调整与本地源配置解耦。每次保存仍然是一个可以阅读、审阅和回填的小文件。',
+      summary: '浏览器调整与本地声明文件解耦。每次保存仍然是一个可以阅读、审阅和回填的小文件。',
       components: [
         {
           id: 'persistence-diagram',
@@ -1619,9 +1619,9 @@ window.BLUEPRINT_CONFIG = {
           eyebrow: 'LOAD ORDER',
           title: '配置加载顺序',
           nodes: [
-            { id: 'config', label: '本地配置' },
-            { id: 'file', label: '覆盖文件' },
-            { id: 'draft', label: '浏览器草稿' },
+            { id: 'config', label: '内容声明' },
+            { id: 'file', label: '生成配置' },
+            { id: 'draft', label: '覆盖草稿' },
             { id: 'artifact', label: '单文件产物' }
           ],
           edges: [['config', 'file'], ['file', 'draft'], ['draft', 'artifact']],
@@ -1631,9 +1631,9 @@ window.BLUEPRINT_CONFIG = {
           id: 'persistence-copy',
           type: 'text',
           eyebrow: 'SOURCE OF TRUTH',
-          title: '配置文件仍然是主源。',
-          body: '预演模式中的修改先写入 localStorage。点击保存后，浏览器输出 blueprint-overrides.json。确认后的覆盖文件放回项目目录，再进入最终打包。',
-          bullets: ['草稿可刷新恢复', '覆盖文件保持小而清晰', '打包前可以人工检查'],
+          title: '声明文件仍然是主源。',
+          body: 'Agent 只编辑 blueprint.source.json。校验与打包会自动生成 blueprint.config.js。预演修改先写入 localStorage，再按需保存为 blueprint-overrides.json。',
+          bullets: ['默认布局由编译器补齐', '生成配置无需手工阅读', '覆盖文件保持小而清晰'],
           slot: { x: 1, y: 6, w: 9, h: 6 }
         },
         {
@@ -1642,8 +1642,8 @@ window.BLUEPRINT_CONFIG = {
           eyebrow: 'DELIVERABLES',
           title: '三层文件关系',
           items: [
-            { value: '01', unit: '份', label: '源配置' },
-            { value: '01', unit: '份', label: '覆盖文件' },
+            { value: '01', unit: '份', label: '内容声明' },
+            { value: '01', unit: '份', label: '生成配置' },
             { value: '01', unit: '个', label: '最终 HTML' }
           ],
           slot: { x: 11, y: 6, w: 6, h: 6 }
@@ -1662,8 +1662,8 @@ window.BLUEPRINT_CONFIG = {
           type: 'text',
           eyebrow: 'SOURCE PROJECT',
           title: '项目目录用于继续修改。',
-          body: '初始化脚本会生成 index.html、blueprint.config.js、blueprint-overrides.json、样式、运行时和 images 目录。',
-          bullets: ['编辑配置', '本地预览', '校验结构', '打包交付'],
+          body: '初始化脚本会生成 blueprint.source.json。普通 Agent 只写节点、关系、场景和内容块；其余文件由构建流程维护。',
+          bullets: ['编辑声明', '校验并编译', '本地预览', '打包交付'],
           slot: { x: 1, y: 1, w: 7, h: 7 }
         },
         {

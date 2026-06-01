@@ -2,6 +2,8 @@
 
 ## Before Preview
 
+- Ordinary authoring changed only `blueprint.source.json` and local image assets.
+- Generated `blueprint.config.js`, runtime, styles, and scripts remain untouched.
 - The overview map explains the argument without requiring clicks.
 - Every scene expands a meaningful node.
 - Every component supports the scene's claim.
@@ -42,6 +44,7 @@
 
 ## Final Artifact
 
+- `blueprint.source.json` remains the authoring source of truth.
 - `validate-blueprint.mjs` passes without errors.
 - Saved overrides have been reviewed.
 - `pack-blueprint.mjs` creates `blueprint.html` in the project root.

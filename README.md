@@ -9,7 +9,7 @@
 | **[detailed-docx](my_skills/detailed-docx/SKILL.md)** | Word 文档精细操作。支持创建、读取、编辑、删除，保留原有格式（字体/颜色/图片/合并单元格），含跨 Run 替换、增量格式叠加、分栏布局、三线表、LaTeX 公式（含编号公式）及表格单元格公式插入。公式引擎支持 pandoc / latex2mathml 双路径，覆盖双栏论文投稿全场景。 | `python-docx` `pandoc`（推荐） |
 | **[sci-group-read](my_skills/sci-group-read/SKILL.md)** | 学术论文系统化分析。4 阶段流水线：PDF 解析 → 结构化提取 → 单篇深度分析 → 跨论文领域综述。 | `PyPDF2` `pdfplumber` `PyMuPDF` |
 | **[html-presentation](my_skills/html-presentation-skill/SKILL.md)** | HTML 演示文稿生成。从 Markdown 或主题快速生成精美的 HTML 幻灯片。 | `Python 3.8+` |
-| **[blueprint-presentation](my_skills/blueprint-presentation/SKILL.md)** | 蓝图式 HTML 大屏展示。以全局结构图组织论述，以递归场景和自由组件展开细节；提供 Swiss 与 Editorial 受控主题、锁定演示模式，以及支持拖动、缩放、少量文本修订、持久化和覆盖文件保存的预演模式。 | `Node.js 18+` |
+| **[blueprint-presentation](my_skills/blueprint-presentation/SKILL.md)** | 声明式蓝图 HTML 大屏展示。只需编写节点、关系、场景和内容块；以全局结构图组织论述，以递归场景和自由组件展开细节，并提供受控主题、演示模式和轻量预演。 | `Node.js 18+` |
 | **[document-format-skills](my_skills/document-format-skills-main/SKILL.md)** | 文档格式处理。格式诊断、标点修复、样式统一，输入杂乱文档输出规范 docx。 | — |
 | **[lightread-cli](my_skills/lightread-cli/SKILL.md)** | LightRead CLI (`lr`) 集成。支持学术文献搜索、网页读取、资料库管理、笔记库维护及自动引用生成。 | `Node.js` |
 | **[my-paper-polish-skills](my_skills/my-paper-polish-skills/SKILL.md)** | 学术论文精修与 LaTeX 辅助。执行无粗体/无冒号/无括注/禁忌短语等硬规则，含一致性自检、表格溢出防护、编辑启发式扫描及 Skill 自更新循环；支持句段润色、全节重写和纯审阅三种响应模式。 | — |
@@ -23,7 +23,7 @@
 
 ### Blueprint Presentation
 
-`blueprint-presentation` 不是传统分页 PPT，而是一套由本地配置驱动的结构化大屏展示方案。初始化项目后，编辑 `blueprint.config.js`，通过浏览器预演布局，最后打包为单个 HTML 文件：
+`blueprint-presentation` 不是传统分页 PPT，而是一套由本地声明驱动的结构化大屏展示方案。初始化项目后，只编辑 `blueprint.source.json` 中的节点、关系、场景和内容块；校验器会自动补齐默认布局并生成底层配置，最后打包为单个 HTML 文件：
 
 ```bash
 node my_skills/blueprint-presentation/scripts/init-blueprint.mjs path/to/project
@@ -36,7 +36,7 @@ python3 -m http.server 4173 --directory path/to/project
 node my_skills/blueprint-presentation/scripts/pack-blueprint.mjs path/to/project
 ```
 
-浏览器默认进入演示模式，仅允许点击节点、跳转场景和查看内容。预演模式用于演讲前校准：支持组件拖动、网格吸附、缩放、少量文本修改、撤销重做，以及保存 `blueprint-overrides.json`。组件数量、类型、关系和主题仍然在本地配置中维护。打包后的 `blueprint.html` 可以直接双击打开，不需要启动本地服务器。
+浏览器默认进入演示模式，仅允许点击节点、跳转场景和查看内容。预演模式用于演讲前校准：支持组件拖动、网格吸附、缩放、少量文本修改、撤销重做，以及保存 `blueprint-overrides.json`。普通 Agent 不需要阅读运行时、样式表或生成配置；组件数量、类型、关系和主题都在 `blueprint.source.json` 中声明。打包后的 `blueprint.html` 可以直接双击打开，不需要启动本地服务器。
 
 ## 目录结构
 
@@ -64,6 +64,7 @@ SKILLS/
 ### 2026-06-01
 - **blueprint-presentation**：新增蓝图式 HTML 展示 skill。支持全局结构图、递归局部画布、节点概览、层级返回、场景跳转、8 类自由组件、16×12 网格布局、演示/预演双模式、拖动缩放、少量文本修订、`localStorage` 草稿持久化、覆盖文件保存、配置校验和单 HTML 打包。
 - **blueprint-presentation**：参考并注明 `op7418/guizang-ppt-skill` 来源，提供 Swiss 与 Editorial 两族九套受控视觉预设；该 skill 单独使用 AGPL-3.0。
+- **blueprint-presentation**：新增 `blueprint.source.json` 声明层。普通 Agent 只需编写节点、关系、场景和内容块；校验与打包自动生成底层配置，并为坐标、画布和网格 slot 提供默认布局。
 
 ### 2026-05-12
 - **detailed-docx**：新增 `add_equation_with_number()`（公式 + 编号一键排版，底层用无边框 1×2 表格）、`add_equation_to_table_cell()`；公式引擎升级为 pandoc 优先三级降级链，返回值新增 `engine` 字段；补充《模板装配陷阱》一节，覆盖双栏宽度计算、多级列表命名样式、LaTeX raw string、PDF 图片转换等真实投稿踩坑。

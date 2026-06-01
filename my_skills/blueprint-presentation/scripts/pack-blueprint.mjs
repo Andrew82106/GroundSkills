@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, resolve } from 'node:path';
+import { buildBlueprintSource } from './build-blueprint.mjs';
 
 const projectDir = resolve(process.argv[2] || '.');
 const outputFlag = process.argv.indexOf('--output');
@@ -15,6 +16,7 @@ async function readOptional(filename, fallback) {
 }
 
 async function main() {
+  await buildBlueprintSource(projectDir, { optional: true, quiet: true });
   const index = await readFile(join(projectDir, 'index.html'), 'utf8');
   const css = await readFile(join(projectDir, 'blueprint.css'), 'utf8');
   const config = await readFile(join(projectDir, 'blueprint.config.js'), 'utf8');

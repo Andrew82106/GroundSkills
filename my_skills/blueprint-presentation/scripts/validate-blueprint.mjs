@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { access } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+import { buildBlueprintSource } from './build-blueprint.mjs';
 import { loadBlueprintConfig } from './load-config.mjs';
 
 const projectDir = resolve(process.argv[2] || '.');
@@ -47,6 +48,7 @@ function slotsOverlap(a, b) {
 }
 
 async function main() {
+  await buildBlueprintSource(projectDir, { optional: true, quiet: true });
   let config;
   try {
     config = await loadBlueprintConfig(projectDir);

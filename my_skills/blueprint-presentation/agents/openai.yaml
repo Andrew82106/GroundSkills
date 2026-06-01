@@ -1,4 +1,4 @@
 interface:
   display_name: "Blueprint Presentation"
   short_description: "Build structured HTML blueprint presentations"
-  default_prompt: "Use $blueprint-presentation to create a structured HTML blueprint presentation with recursive pannable canvases, nested structure components, hierarchical navigation, a controlled visual-system preset, configurable interface language, and rehearsal mode."
+  default_prompt: "Use $blueprint-presentation to create a structured HTML blueprint presentation. Author only the declarative blueprint.source.json outline unless I explicitly request engine changes. Focus on nodes, relations, scenes, evidence blocks, and the final single-file HTML."
